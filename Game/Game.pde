@@ -7,9 +7,9 @@ void setup() {
 }
 
 float angleX = 1f;
-float angleZ = 0.5f;
+float angleZ = 0f;
 float rotationSpeed = 1f;
-float p = 0f;
+float p = -1f;
 
 void draw() {
   p += 0.01;
@@ -20,12 +20,12 @@ void draw() {
   if (p > 1) {
     noLoop();
   }
-  float rX = map(p, 0, 1, -PI / 3, 0);
-  float rZ = map(angleZ, 0, 1, -PI / 3, PI / 3);
+  float rX = map(p, -1, 1, -PI / 3, PI / 3);
+  float rZ = map(angleZ, -1, 1, -PI / 3, PI / 3);
   rotateX(rX);
   rotateZ(rZ);
   pushMatrix();
-  box(100, 100, 5);
+  box(100, 5, 100);
   popMatrix();
 }
 
