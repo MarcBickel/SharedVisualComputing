@@ -18,12 +18,18 @@ void draw() {
   camera(width / 2, height / 2 - 50, 200, 250, 250, 0, 0, 1, 0);
   background(200);
   lights();
+  drawBoard();
+}
+
+void drawBoard() {
+  pushMatrix();
   translate(width / 2, height / 2, 0);
   float rX = map(angleX, -1, 1, -PI / 3, PI / 3);
   float rZ = map(angleZ, -1, 1, -PI / 3, PI / 3);
   rotateX(rX);
   rotateZ(rZ);
   box(100, 3, 100);
+  popMatrix();
 }
 
 void mouseDragged() {
