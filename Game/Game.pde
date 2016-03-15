@@ -4,28 +4,33 @@ void settings() {
 
 void setup() {
   noStroke();
+  mover = new Mover();
 }
 
 float angleX = 0f;
 float angleZ = 0f;
 float rotationSpeed = 0.005f;
+float rX;
+float rZ;
 int lastMouseX;
 int lastMouseY;
-final float maxRotationSpeed = 0.010f;
-final float minRotationSpeed = 0.001f;
+Mover mover;
 
 void draw() {
   camera(width / 2, height / 2 - 50, 200, 250, 250, 0, 0, 1, 0);
   background(200);
   lights();
   drawBoard();
+  mover.update();
+  mover.checkEdges();
+  mover.display();
 }
 
 void drawBoard() {
   pushMatrix();
   translate(width / 2, height / 2, 0);
-  float rX = map(angleX, -1, 1, -PI / 3, PI / 3);
-  float rZ = map(angleZ, -1, 1, -PI / 3, PI / 3);
+  rX = map(angleX, -1, 1, -PI / 3, PI / 3);
+  rZ = map(angleZ, -1, 1, -PI / 3, PI / 3);
   rotateX(rX);
   rotateZ(rZ);
   box(100, 3, 100);
@@ -50,7 +55,10 @@ void mousePressed() {
 }
 
 void mouseWheel(MouseEvent event) {
+  final float maxRotationSpeed = 0.010f;
+  final float minRotationSpeed = 0.001f;
   float e = event.getCount();
+  
   rotationSpeed -= (e / 6000f);
   if (rotationSpeed < minRotationSpeed) {
     rotationSpeed = minRotationSpeed;
