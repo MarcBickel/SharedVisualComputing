@@ -8,13 +8,13 @@ void setup() {
 
 float angleX = 0f;
 float angleZ = 0f;
-float rotationSpeed = 0.01f;
-int mouseReleasedX = width / 2;
-int mouseReleasedY = height / 2;
+float rotationSpeed = 0.005f;
+int lastMouseX;
+int lastMouseY;
 
 void draw() {
   camera(width / 2, height / 2 - 50, 200, 250, 250, 0, 0, 1, 0);
-  background(255, 0, 255);
+  background(200);
   lights();
   translate(width / 2, height / 2, 0);
   float rX = map(angleX, -1, 1, -PI / 3, PI / 3);
@@ -26,11 +26,17 @@ void draw() {
 
 void mouseDragged() {
   // modifies the value of angleX, angleZ from -1 to 1
-  angleX = map(mouseY, 0, height, 1, -1);
-  angleZ = map(mouseX, 0, width, -1, 1);
+  angleZ += (mouseX - lastMouseX) * rotationSpeed;
+  angleX -= (mouseY - lastMouseY) * rotationSpeed;
+  if (angleX > 1) angleX = 1;
+  if (angleX < -1) angleX = -1;
+  if (angleZ > 1) angleZ = 1;
+  if (angleZ < -1) angleZ = -1;
+  lastMouseX = mouseX;
+  lastMouseY = mouseY;
 }
 
-void mouseReleased() {
-  mouseReleasedX = mouseX;
-  mouseReleasedY = mouseY;
+void mousePressed() {
+  lastMouseX = mouseX;
+  lastMouseY = mouseY;
 }
