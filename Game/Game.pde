@@ -11,6 +11,8 @@ float angleZ = 0f;
 float rotationSpeed = 0.005f;
 int lastMouseX;
 int lastMouseY;
+final float maxRotationSpeed = 0.010f;
+final float minRotationSpeed = 0.001f;
 
 void draw() {
   camera(width / 2, height / 2 - 50, 200, 250, 250, 0, 0, 1, 0);
@@ -39,4 +41,14 @@ void mouseDragged() {
 void mousePressed() {
   lastMouseX = mouseX;
   lastMouseY = mouseY;
+}
+
+void mouseWheel(MouseEvent event) {
+  float e = event.getCount();
+  rotationSpeed -= (e / 6000f);
+  if (rotationSpeed < minRotationSpeed) {
+    rotationSpeed = minRotationSpeed;
+  } else if (rotationSpeed > maxRotationSpeed) {
+    rotationSpeed = maxRotationSpeed;
+  }
 }
