@@ -1,39 +1,54 @@
 class Mover {
   PVector location;
   PVector velocity;
+  PVector gravityForce;
+  PVector friction;
+  
   float gravityConstant = 0.1;
-  PVector gravityForce = new PVector(sin(rZ) * gravityConstant, 0, sin(rX) * gravityConstant);
   float reboundCoeff = 0.8f;
   float radiusSphere = 5.0f;
   float normalForce = 1;
   float mu = 0.01;
   float frictionMagnitude = normalForce * mu;
   
-  
-
-
-  
   Mover() {
-    location = new PVector(width/2f, (height/2f) - radiusSphere - 1.5, 0);
+    location = new PVector(0, -6.5, 0);
     velocity = new PVector(0f, 0f, 0f);
   }
+  
   void update() {
-    location.add(velocity);
-    PVector friction = velocity.get();
+    gravityForce = new PVector(sin(rZ) * gravityConstant, 0, - sin(rX) * gravityConstant);
+    friction = velocity.copy();
     friction.mult(-1);
     friction.normalize();
     friction.mult(frictionMagnitude);
-    velocity.x += friction.x;
-    velocity.y += friction.y;
-    velocity.z += friction.z;
+    velocity.add(friction.add(gravityForce));
   }
+  
   void display() {
     pushMatrix();
-    translate(location.x + velocity.x, location.x + velocity.y, location.z + velocity.z);
+    location.add(velocity);
+    translate(width / 2, height / 2, 0);
+    rotateX(rX);
+    rotateZ(rZ);
+    translate(location.x, location.y, location.z);
     sphere(5);
     popMatrix();
   }
+  
   void checkEdges() {
-    //TODO
+    if (location.x < -50) {
+      location.x = -50;
+      velocity.x = velocity.x * -1 * reboundCoeff;
+    } else if (location.x > 50) {
+      location.x = 50;
+      velocity.x = velocity.x * -1 * reboundCoeff;
+    } else if (location.z < -50) {
+      location.z = -50;
+      velocity.z = velocity.z * -1 * reboundCoeff;
+    } else if (location.z > 50) {
+      location.z = 50;
+      velocity.z = velocity.z * -1 * reboundCoeff;
+    }
   }
 }
