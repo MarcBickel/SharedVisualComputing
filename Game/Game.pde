@@ -1,5 +1,5 @@
 void settings() {
-  size(500, 500, P3D);
+  fullScreen(P3D);
 }
 
 void setup() {
@@ -17,7 +17,7 @@ int lastMouseY;
 Mover mover;
 
 void draw() {
-  camera(width / 2, height / 2, 200, 250, 250, 0, 0, 1, 0);
+  camera(width / 2, height / 2, 200, width / 2, height / 2, 0, 0, 1, 0);
   background(200);
   directionalLight(50, 100, 125, 1, 1, 0);
   ambientLight(102, 102, 102);
