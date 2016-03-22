@@ -15,16 +15,28 @@ float rZ;
 int lastMouseX;
 int lastMouseY;
 Mover mover;
+enum Mode {
+  GAMER, PLACER
+}
+Mode mode = Mode.GAMER;
 
 void draw() {
-  camera(width / 2, height / 2, 200, width / 2, height / 2, 0, 0, 1, 0);
   background(200);
-  directionalLight(50, 100, 125, 1, 1, 0);
-  ambientLight(102, 102, 102);
-  drawBoard();
-  mover.update();
-  mover.checkEdges();
-  mover.display();
+  switch (mode) {
+    case GAMER: 
+      camera(width / 2, height / 2, 200, width / 2, height / 2, 0, 0, 1, 0);
+      directionalLight(50, 100, 125, 1, 1, 0);
+      ambientLight(102, 102, 102);
+      drawBoard();
+      mover.update();
+      mover.checkEdges();
+      mover.display();
+      break;
+    case PLACER: 
+      break;
+    default: 
+      break;
+  }
 }
 
 void drawBoard() {
@@ -32,10 +44,26 @@ void drawBoard() {
   translate(width / 2, height / 2, 0);
   rX = map(angleX, -1, 1, -PI / 3, PI / 3);
   rZ = map(angleZ, -1, 1, -PI / 3, PI / 3);
-  rotateX(rX);
-  rotateZ(rZ);
+  switch(mode) {
+    case GAMER: 
+      rotateX(rX);
+      rotateZ(rZ);
+      break;
+    case PLACER :
+      rotateX(0);
+      rotateZ(0);
+      break;
+    default: 
+      break;  
+  }  
   box(100, 3, 100);
   popMatrix();
+}
+
+void keyPressed() {
+  if (keyCode == SHIFT) {
+    mode = Mode.PLACER;
+  }
 }
 
 void mouseDragged() {
