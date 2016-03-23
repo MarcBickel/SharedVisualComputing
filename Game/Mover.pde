@@ -28,9 +28,6 @@ class Mover {
   void display() {
     pushMatrix();
     location.add(velocity);
-    translate(width / 2, height / 2, 0);
-    rotateX(rX);
-    rotateZ(rZ);
     translate(location.x, location.y, location.z);
     sphere(5);
     popMatrix();

@@ -22,15 +22,22 @@ Mode mode = Mode.GAMER;
 
 void draw() {
   background(200);
+  directionalLight(50, 100, 125, 1, 1, 0);
+  ambientLight(102, 102, 102);
   switch (mode) {
     case GAMER: 
+      pushMatrix();
       camera(width / 2, height / 2, 200, width / 2, height / 2, 0, 0, 1, 0);
-      directionalLight(50, 100, 125, 1, 1, 0);
-      ambientLight(102, 102, 102);
+      translate(width / 2, height / 2, 0);
+      rX = map(angleX, -1, 1, -PI / 3, PI / 3);
+      rZ = map(angleZ, -1, 1, -PI / 3, PI / 3);
+      rotateX(rX);
+      rotateZ(rZ);
       drawBoard();
       mover.update();
       mover.checkEdges();
       mover.display();
+      popMatrix();
       break;
     case PLACER: 
       break;
@@ -40,14 +47,8 @@ void draw() {
 }
 
 void drawBoard() {
-  pushMatrix();
-  translate(width / 2, height / 2, 0);
-  rX = map(angleX, -1, 1, -PI / 3, PI / 3);
-  rZ = map(angleZ, -1, 1, -PI / 3, PI / 3);
   switch(mode) {
     case GAMER: 
-      rotateX(rX);
-      rotateZ(rZ);
       break;
     case PLACER :
       rotateX(0);
@@ -57,7 +58,6 @@ void drawBoard() {
       break;  
   }  
   box(100, 3, 100);
-  popMatrix();
 }
 
 void keyPressed() {
