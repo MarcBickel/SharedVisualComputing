@@ -26,9 +26,9 @@ void draw() {
   ambientLight(102, 102, 102);
   switch (mode) {
     case GAMER: 
+      camera(0, 0, 200, 0, 0, 0, 0, 1, 0);
       pushMatrix();
-      camera(width / 2, height / 2, 200, width / 2, height / 2, 0, 0, 1, 0);
-      translate(width / 2, height / 2, 0);
+      //translate(width / 2, height / 2, 0);
       rX = map(angleX, -1, 1, -PI / 3, PI / 3);
       rZ = map(angleZ, -1, 1, -PI / 3, PI / 3);
       rotateX(rX);
@@ -40,6 +40,13 @@ void draw() {
       popMatrix();
       break;
     case PLACER: 
+      camera(0, 0, 100, 0, 0, 0, 0, 1, 0);
+      pushMatrix();
+      //translate(width / 2, height / 2, 0);
+      rotateX(-PI / 2);
+      drawBoard();
+      mover.display();
+      popMatrix();
       break;
     default: 
       break;
@@ -51,8 +58,6 @@ void drawBoard() {
     case GAMER: 
       break;
     case PLACER :
-      rotateX(0);
-      rotateZ(0);
       break;
     default: 
       break;  

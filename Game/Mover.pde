@@ -23,11 +23,11 @@ class Mover {
     friction.normalize();
     friction.mult(frictionMagnitude);
     velocity.add(friction.add(gravityForce));
+    location.add(velocity);
   }
   
   void display() {
     pushMatrix();
-    location.add(velocity);
     translate(location.x, location.y, location.z);
     sphere(5);
     popMatrix();
