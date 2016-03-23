@@ -22,18 +22,20 @@ Mode mode = Mode.GAMER;
 
 void draw() {
   background(200);
-  directionalLight(50, 100, 125, 1, 1, 0);
-  ambientLight(102, 102, 102);
+  
   switch (mode) {
     case GAMER: 
       camera(0, 0, 200, 0, 0, 0, 0, 1, 0);
+      directionalLight(255, 195, 0, 1, 1, 0);
+      ambientLight(102, 102, 102);
       pushMatrix();
-      //translate(width / 2, height / 2, 0);
+      fill(104, 100, 48, 23);
       rX = map(angleX, -1, 1, -PI / 3, PI / 3);
       rZ = map(angleZ, -1, 1, -PI / 3, PI / 3);
       rotateX(rX);
       rotateZ(rZ);
       drawBoard();
+      fill(0, 0, 0);
       mover.update();
       mover.checkEdges();
       mover.display();
@@ -41,8 +43,9 @@ void draw() {
       break;
     case PLACER: 
       camera(0, 0, 100, 0, 0, 0, 0, 1, 0);
+      directionalLight(50, 100, 125, -1, -1, -1);
+      ambientLight(102, 102, 102);
       pushMatrix();
-      //translate(width / 2, height / 2, 0);
       rotateX(-PI / 2);
       drawBoard();
       mover.display();
@@ -71,16 +74,28 @@ void keyPressed() {
   }
 }
 
+void keyReleased() {
+  if (keyCode == SHIFT) {
+    mode = Mode.GAMER;
+  }
+}
+
 void mouseDragged() {
-  // modifies the value of angleX, angleZ from -1 to 1
-  angleZ += (mouseX - lastMouseX) * rotationSpeed;
-  angleX -= (mouseY - lastMouseY) * rotationSpeed;
-  if (angleX > 1) angleX = 1;
-  if (angleX < -1) angleX = -1;
-  if (angleZ > 1) angleZ = 1;
-  if (angleZ < -1) angleZ = -1;
-  lastMouseX = mouseX;
-  lastMouseY = mouseY;
+  switch (mode) {
+    case GAMER:
+      // modifies the value of angleX, angleZ from -1 to 1
+      angleZ += (mouseX - lastMouseX) * rotationSpeed;
+      angleX -= (mouseY - lastMouseY) * rotationSpeed;
+      if (angleX > 1) angleX = 1;
+      if (angleX < -1) angleX = -1;
+      if (angleZ > 1) angleZ = 1;
+      if (angleZ < -1) angleZ = -1;
+      lastMouseX = mouseX;
+      lastMouseY = mouseY;
+      break;
+    case PLACER:
+      break;
+  }
 }
 
 void mousePressed() {

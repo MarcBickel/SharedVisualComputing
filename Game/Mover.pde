@@ -37,13 +37,16 @@ class Mover {
     if (location.x < -50) {
       location.x = -50;
       velocity.x = velocity.x * -1 * reboundCoeff;
-    } else if (location.x > 50) {
+    } 
+    if (location.x > 50) {
       location.x = 50;
       velocity.x = velocity.x * -1 * reboundCoeff;
-    } else if (location.z < -50) {
+    } 
+    if (location.z < -50) {
       location.z = -50;
       velocity.z = velocity.z * -1 * reboundCoeff;
-    } else if (location.z > 50) {
+    } 
+    if (location.z > 50) {
       location.z = 50;
       velocity.z = velocity.z * -1 * reboundCoeff;
     }
