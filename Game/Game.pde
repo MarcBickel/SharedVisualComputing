@@ -19,6 +19,7 @@ enum Mode {
   GAMER, PLACER
 }
 Mode mode = Mode.GAMER;
+ArrayList<PVector> cylinders = new ArrayList();
 
 void draw() {
   background(200);
@@ -45,9 +46,11 @@ void draw() {
       camera(0, 0, 100, 0, 0, 0, 0, 1, 0);
       directionalLight(50, 100, 125, -1, -1, -1);
       ambientLight(102, 102, 102);
+      fill(104, 100, 48, 23);
       pushMatrix();
       rotateX(-PI / 2);
       drawBoard();
+      fill(0, 0, 0);
       mover.display();
       popMatrix();
       break;
@@ -99,8 +102,23 @@ void mouseDragged() {
 }
 
 void mousePressed() {
-  lastMouseX = mouseX;
-  lastMouseY = mouseY;
+  switch (mode) {
+    case GAMER: 
+      lastMouseX = mouseX;
+      lastMouseY = mouseY;
+      break;
+    case PLACER:
+      int x;
+      int y;
+      
+      /*if (mouseX < width/2 + 50 && mouseX > width/2 - 50 && mouseY < height/2 + 50 && mouseY > height/2 - 50) {
+        cylinders.add(new PVector(mouseX - width/2, mouseY - height/2));
+      }
+      println(cylinders);*/
+      println(mouseX + " " + mouseY);
+      break;§
+  }
+  
 }
 
 void mouseWheel(MouseEvent event) {
