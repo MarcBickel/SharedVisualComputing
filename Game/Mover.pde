@@ -51,4 +51,20 @@ class Mover {
       velocity.z = velocity.z * -1 * reboundCoeff;
     }
   }
+  
+  void checkCylinderCollision() {
+    PVector normal;
+    for (PVector vect : cylinders) {
+      if (closerThan(vect, new PVector(location.x, location.z), radiusSphere + cylinder.cylinderBaseSize)) {
+        normal = new PVector(location.x - vect.x, 0, location.z - vect.y);
+        normal.normalize();
+        velocity.sub(normal.mult(velocity.dot(normal) * 2));
+        //location.add(normal.mult(cylinder.cylinderBaseSize - (dist(location.x, location.z + radiusSphere, vect.x, vect.y) - radiusSphere)));
+        //location.x = vect.x + normal.x * (cylinder.cylinderBaseSize + radiusSphere);
+        //location.z = vect.y + normal.z * (cylinder.cylinderBaseSize + radiusSphere);
+      }
+    }
+    
+    
+  }
 }

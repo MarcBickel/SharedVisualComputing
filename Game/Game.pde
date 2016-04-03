@@ -12,6 +12,8 @@ float angleZ = 0f;
 float rotationSpeed = 0.005f;
 float rX;
 float rZ;
+float cylinderX;
+float cylinderY;
 int lastMouseX;
 int lastMouseY;
 Mover mover;
@@ -20,6 +22,7 @@ enum Mode {
 }
 Mode mode = Mode.GAMER;
 ArrayList<PVector> cylinders = new ArrayList();
+Cylinder cylinder = new Cylinder();
 
 void draw() {
   background(200);
@@ -30,15 +33,20 @@ void draw() {
       directionalLight(255, 195, 0, 1, 1, 0);
       ambientLight(102, 102, 102);
       pushMatrix();
-      fill(104, 100, 48, 23);
+      fill(247, 202, 201);
       rX = map(angleX, -1, 1, -PI / 3, PI / 3);
       rZ = map(angleZ, -1, 1, -PI / 3, PI / 3);
       rotateX(rX);
       rotateZ(rZ);
+      for (PVector vect : cylinders) {
+        cylinder.drawCylinder(vect);
+      }
+      fill(104, 100, 48);
       drawBoard();
       fill(0, 0, 0);
       mover.update();
       mover.checkEdges();
+      mover.checkCylinderCollision();
       mover.display();
       popMatrix();
       break;
@@ -46,10 +54,17 @@ void draw() {
       camera(0, 0, 100, 0, 0, 0, 0, 1, 0);
       directionalLight(50, 100, 125, -1, -1, -1);
       ambientLight(102, 102, 102);
-      fill(104, 100, 48, 23);
+      fill(104, 100, 48);
       pushMatrix();
       rotateX(-PI / 2);
+      cylinderX = map(mouseX, 0f, width, -50, 50);
+      cylinderY = map(mouseY, 0f, height, -50, 50);
       drawBoard();
+      fill(247, 202, 201);
+      for (PVector vect : cylinders) {
+        cylinder.drawCylinder(vect);
+      }
+      cylinder.drawCylinder(new PVector(cylinderX, cylinderY));
       fill(0, 0, 0);
       mover.display();
       popMatrix();
@@ -70,6 +85,12 @@ void drawBoard() {
   }  
   box(100, 3, 100);
 }
+
+boolean closerThan(PVector v1, PVector v2, float dist) {
+  return dist(v1.x, v1.y, v2.x, v2.y) < dist;
+}
+
+
 
 void keyPressed() {
   if (keyCode == SHIFT) {
@@ -108,15 +129,21 @@ void mousePressed() {
       lastMouseY = mouseY;
       break;
     case PLACER:
-      int x;
-      int y;
+      PVector actual = new PVector(cylinderX, cylinderY);
+      boolean adding = true;
       
-      /*if (mouseX < width/2 + 50 && mouseX > width/2 - 50 && mouseY < height/2 + 50 && mouseY > height/2 - 50) {
-        cylinders.add(new PVector(mouseX - width/2, mouseY - height/2));
+      for (PVector vect : cylinders) {
+        if (closerThan(actual, vect, cylinder.cylinderBaseSize * 2)) {
+          adding = false;
+        }
       }
-      println(cylinders);*/
-      println(mouseX + " " + mouseY);
-      break;§
+      if (closerThan(mover.location, actual, mover.radiusSphere + cylinder.cylinderBaseSize)) {
+        adding = false;
+      }
+      if (adding) {
+        cylinders.add(actual);
+      }
+      break;
   }
   
 }
