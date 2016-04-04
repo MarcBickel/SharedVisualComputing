@@ -59,9 +59,10 @@ class Mover {
         normal = new PVector(location.x - vect.x, 0, location.z - vect.y);
         normal.normalize();
         velocity.sub(normal.mult(velocity.dot(normal) * 2));
-        //location.add(normal.mult(cylinder.cylinderBaseSize - (dist(location.x, location.z + radiusSphere, vect.x, vect.y) - radiusSphere)));
-        //location.x = vect.x + normal.x * (cylinder.cylinderBaseSize + radiusSphere);
-        //location.z = vect.y + normal.z * (cylinder.cylinderBaseSize + radiusSphere);
+        normal.normalize();
+        
+        location.x = vect.x - normal.x * (cylinder.cylinderBaseSize + radiusSphere + 0.00000001 * cylinder.cylinderBaseSize);
+        location.z = vect.y - normal.z * (cylinder.cylinderBaseSize + radiusSphere + 0.00000001 * cylinder.cylinderBaseSize);
       }
     }
     

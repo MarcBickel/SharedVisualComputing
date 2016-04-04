@@ -137,7 +137,7 @@ void mousePressed() {
           adding = false;
         }
       }
-      if (closerThan(mover.location, actual, mover.radiusSphere + cylinder.cylinderBaseSize)) {
+      if (closerThan(new PVector(mover.location.x, mover.location.z), actual, mover.radiusSphere + cylinder.cylinderBaseSize)) {
         adding = false;
       }
       if (adding) {
