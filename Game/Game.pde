@@ -25,43 +25,49 @@ enum Mode {
   GAMER, PLACER
 }
 Mode mode = Mode.GAMER;
-ArrayList<PVector> cylinders = new ArrayList();
+
 Cylinder cylinder = new Cylinder();
+
+ArrayList<PVector> cylinders = new ArrayList();
 
 void draw() {
   background(200); 
   camera();
-  
-      directionalLight(255, 240, 224, -1, 12, -9);
-      ambientLight(46, 106, 255);
+  directionalLight(255, 240, 224, -1, 12, -9);
+  ambientLight(46, 106, 255);
   
   switch (mode) {
     case GAMER:
       pushMatrix();
       rX = map(angleX, -1, 1, -PI / 3, PI / 3);
       rZ = map(angleZ, -1, 1, -PI / 3, PI / 3);
-      translate(width/2, height/2);
+      
+      translate(width / 2, height / 2, 0);
       rotateX(rX);
       rotateZ(rZ);
-      fill(242, 145, 0);
+      
+      //Dessine tous les cylinders en orange
       for (PVector vect : cylinders) {
         cylinder.drawCylinder(vect);
       }
-      fill(42, 112, 37);
+      
+      // Dessine la plaque en vert
       drawBoard();
-      fill(255, 0, 0);
+      
+      // Dessine la boule en rouge
       mover.update();
       mover.checkEdges();
       mover.checkCylinderCollision();
       mover.display();
       popMatrix();
       break;
-    case PLACER: 
-      
+    case PLACER:       
       pushMatrix();
-      translate(width/2, height/2,0);
+      
+      // Tourne la plaque en direction de la camera
+      translate(width / 2, height / 2, 0);
       rotateX(-PI / 2);
-      fill(42, 112, 37);
+      
       drawBoard();
       fill(242, 145, 0);
       for (PVector vect : cylinders) {
@@ -70,8 +76,8 @@ void draw() {
       cylinderX = mouseX - width/2;
       cylinderY = mouseY - height / 2;
       cylinder.drawCylinder(new PVector(cylinderX, cylinderY));
-      
-      fill(255, 0, 0);
+
+      // Dessine la plaque mais n'update pas la vitesse, position de la boule
       mover.display();
       popMatrix();
       break;
@@ -81,22 +87,13 @@ void draw() {
 }
 
 void drawBoard() {
-  switch(mode) {
-    case GAMER: 
-      break;
-    case PLACER :
-      break;
-    default: 
-      break;  
-  }  
+  fill(42, 112, 37);
   box(boxSize, boxThickness, boxSize);
 }
 
 boolean closerThan(PVector v1, PVector v2, float dist) {
   return dist(v1.x, v1.y, v2.x, v2.y) < dist;
 }
-
-
 
 void keyPressed() {
   if (keyCode == SHIFT) {
@@ -125,12 +122,15 @@ void mouseDragged() {
       break;
     case PLACER:
       break;
+    default:
+      break;
   }
 }
 
 void mousePressed() {
   switch (mode) {
     case GAMER: 
+      // Enregistre les positions de la souris pour connaitre l'ampleur du drag
       lastMouseX = mouseX;
       lastMouseY = mouseY;
       break;
@@ -139,10 +139,12 @@ void mousePressed() {
       boolean adding = true;
       
       for (PVector vect : cylinders) {
+        // Si il y a déjà un cylindre trop près
         if (closerThan(actual, vect, cylinder.cylinderBaseSize * 2.5)) {
           adding = false;
         }
       }
+      // Si la balle et le cylindre sont trop proches
       if (closerThan(new PVector(mover.location.x, mover.location.z), actual, mover.radiusSphere + cylinder.cylinderBaseSize)) {
         adding = false;
       }
@@ -152,6 +154,8 @@ void mousePressed() {
       if (adding) {
         cylinders.add(actual);
       }
+      break;
+    default:
       break;
   }
   

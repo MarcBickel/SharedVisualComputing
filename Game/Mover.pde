@@ -27,7 +27,8 @@ class Mover {
   }
   
   void display() {
-    pushMatrix();
+    pushMatrix(); 
+    fill(255, 0, 0);
     translate(location.x, location.y, location.z);
     sphere(radiusSphere);
     popMatrix();
@@ -64,8 +65,6 @@ class Mover {
         location.x = vect.x - normal.x * (cylinder.cylinderBaseSize + radiusSphere + 0.001 * cylinder.cylinderBaseSize);
         location.z = vect.y - normal.z * (cylinder.cylinderBaseSize + radiusSphere + 0.001 * cylinder.cylinderBaseSize);
       }
-    }
-    
-    
+    }    
   }
 }
