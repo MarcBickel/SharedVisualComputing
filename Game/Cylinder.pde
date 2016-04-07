@@ -1,7 +1,7 @@
 class Cylinder {
   
   float cylinderBaseSize = 32;
-  float cylinderHeight = 48;
+  float cylinderHeight = 70;
   int cylinderResolution = 40;
   PShape openCylinder = new PShape();
   PShape t1 = new PShape();
