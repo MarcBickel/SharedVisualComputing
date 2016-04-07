@@ -4,15 +4,15 @@ class Mover {
   PVector gravityForce;
   PVector friction;
   
-  float gravityConstant = 0.1;
+  float gravityConstant = 0.8;
   float reboundCoeff = 0.8f;
-  float radiusSphere = 5.0f;
+  float radiusSphere = 40f;
   float normalForce = 1;
   float mu = 0.01;
   float frictionMagnitude = normalForce * mu;
   
   Mover() {
-    location = new PVector(0, -6.5, 0);
+    location = new PVector(0, -(boxThickness / 2 + radiusSphere), 0);
     velocity = new PVector(0f, 0f, 0f);
   }
   
@@ -29,25 +29,25 @@ class Mover {
   void display() {
     pushMatrix();
     translate(location.x, location.y, location.z);
-    sphere(5);
+    sphere(radiusSphere);
     popMatrix();
   }
   
   void checkEdges() {
-    if (location.x < -50) {
-      location.x = -50;
+    if (location.x < -400) {
+      location.x = -400;
       velocity.x = velocity.x * -1 * reboundCoeff;
     } 
-    if (location.x > 50) {
-      location.x = 50;
+    if (location.x > 400) {
+      location.x = 400;
       velocity.x = velocity.x * -1 * reboundCoeff;
     } 
-    if (location.z < -50) {
-      location.z = -50;
+    if (location.z < -400) {
+      location.z = -400;
       velocity.z = velocity.z * -1 * reboundCoeff;
     } 
-    if (location.z > 50) {
-      location.z = 50;
+    if (location.z > 400) {
+      location.z = 400;
       velocity.z = velocity.z * -1 * reboundCoeff;
     }
   }
@@ -61,8 +61,8 @@ class Mover {
         velocity.sub(normal.mult(velocity.dot(normal) * 2));
         normal.normalize();
         
-        location.x = vect.x - normal.x * (cylinder.cylinderBaseSize + radiusSphere + 0.00000001 * cylinder.cylinderBaseSize);
-        location.z = vect.y - normal.z * (cylinder.cylinderBaseSize + radiusSphere + 0.00000001 * cylinder.cylinderBaseSize);
+        location.x = vect.x - normal.x * (cylinder.cylinderBaseSize + radiusSphere + 0.001 * cylinder.cylinderBaseSize);
+        location.z = vect.y - normal.z * (cylinder.cylinderBaseSize + radiusSphere + 0.001 * cylinder.cylinderBaseSize);
       }
     }
     

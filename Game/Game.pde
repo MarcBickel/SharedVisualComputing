@@ -16,6 +16,10 @@ float cylinderX;
 float cylinderY;
 int lastMouseX;
 int lastMouseY;
+
+float boxThickness = 24f;
+float boxSize = 800f;
+
 Mover mover;
 enum Mode {
   GAMER, PLACER
@@ -25,17 +29,18 @@ ArrayList<PVector> cylinders = new ArrayList();
 Cylinder cylinder = new Cylinder();
 
 void draw() {
-  background(200);
+  background(200); 
+  camera();
   
   switch (mode) {
-    case GAMER: 
-      camera(0, 0, 200, 0, 0, 0, 0, 1, 0);
+    case GAMER:
       directionalLight(255, 195, 0, 1, 1, 0);
       ambientLight(102, 102, 102);
       pushMatrix();
       fill(247, 202, 201);
       rX = map(angleX, -1, 1, -PI / 3, PI / 3);
       rZ = map(angleZ, -1, 1, -PI / 3, PI / 3);
+      translate(width/2, height/2);
       rotateX(rX);
       rotateZ(rZ);
       for (PVector vect : cylinders) {
@@ -51,20 +56,22 @@ void draw() {
       popMatrix();
       break;
     case PLACER: 
-      camera(0, 0, 100, 0, 0, 0, 0, 1, 0);
+      
+      pushMatrix();
       directionalLight(50, 100, 125, -1, -1, -1);
       ambientLight(102, 102, 102);
       fill(104, 100, 48);
-      pushMatrix();
+      translate(width/2, height/2,0);
       rotateX(-PI / 2);
-      cylinderX = map(mouseX, 0f, width, -50, 50);
-      cylinderY = map(mouseY, 0f, height, -50, 50);
       drawBoard();
       fill(247, 202, 201);
       for (PVector vect : cylinders) {
         cylinder.drawCylinder(vect);
       }
+      cylinderX = mouseX - width/2;
+      cylinderY = mouseY - height / 2;
       cylinder.drawCylinder(new PVector(cylinderX, cylinderY));
+      
       fill(0, 0, 0);
       mover.display();
       popMatrix();
@@ -83,7 +90,7 @@ void drawBoard() {
     default: 
       break;  
   }  
-  box(100, 3, 100);
+  box(boxSize, boxThickness, boxSize);
 }
 
 boolean closerThan(PVector v1, PVector v2, float dist) {
@@ -133,11 +140,14 @@ void mousePressed() {
       boolean adding = true;
       
       for (PVector vect : cylinders) {
-        if (closerThan(actual, vect, cylinder.cylinderBaseSize * 2)) {
+        if (closerThan(actual, vect, cylinder.cylinderBaseSize * 2.5)) {
           adding = false;
         }
       }
       if (closerThan(new PVector(mover.location.x, mover.location.z), actual, mover.radiusSphere + cylinder.cylinderBaseSize)) {
+        adding = false;
+      }
+      if (cylinderX > boxSize/2 || cylinderX < -boxSize/2 || cylinderY < -boxSize/2 || cylinderY > boxSize/2) {
         adding = false;
       }
       if (adding) {
