@@ -40,10 +40,12 @@ class Cylinder {
     }
     t1.endShape();
     t2.endShape();
+    openCylinder.endShape();   }
     
-  void drawCylinder(PVector coordinates) {  
-    setup();
+  void drawCylinder(PVector coordinates) { 
+    set();
     pushMatrix();
+    fill(242, 145, 0);
     translate(coordinates.x, - (boxThickness/2 + cylinderHeight), coordinates.y);
     shape(openCylinder);
     shape(t1);
