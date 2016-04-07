@@ -32,23 +32,24 @@ void draw() {
   background(200); 
   camera();
   
+      directionalLight(255, 240, 224, -1, 12, -9);
+      ambientLight(46, 106, 255);
+  
   switch (mode) {
     case GAMER:
-      directionalLight(255, 195, 0, 1, 1, 0);
-      ambientLight(102, 102, 102);
       pushMatrix();
-      fill(247, 202, 201);
       rX = map(angleX, -1, 1, -PI / 3, PI / 3);
       rZ = map(angleZ, -1, 1, -PI / 3, PI / 3);
       translate(width/2, height/2);
       rotateX(rX);
       rotateZ(rZ);
+      fill(242, 145, 0);
       for (PVector vect : cylinders) {
         cylinder.drawCylinder(vect);
       }
-      fill(104, 100, 48);
+      fill(42, 112, 37);
       drawBoard();
-      fill(0, 0, 0);
+      fill(255, 0, 0);
       mover.update();
       mover.checkEdges();
       mover.checkCylinderCollision();
@@ -58,13 +59,11 @@ void draw() {
     case PLACER: 
       
       pushMatrix();
-      directionalLight(50, 100, 125, -1, -1, -1);
-      ambientLight(102, 102, 102);
-      fill(104, 100, 48);
       translate(width/2, height/2,0);
       rotateX(-PI / 2);
+      fill(42, 112, 37);
       drawBoard();
-      fill(247, 202, 201);
+      fill(242, 145, 0);
       for (PVector vect : cylinders) {
         cylinder.drawCylinder(vect);
       }
@@ -72,7 +71,7 @@ void draw() {
       cylinderY = mouseY - height / 2;
       cylinder.drawCylinder(new PVector(cylinderX, cylinderY));
       
-      fill(0, 0, 0);
+      fill(255, 0, 0);
       mover.display();
       popMatrix();
       break;

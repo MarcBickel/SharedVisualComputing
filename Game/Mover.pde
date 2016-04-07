@@ -34,19 +34,19 @@ class Mover {
   }
   
   void checkEdges() {
-    if (location.x < -400) {
+    if (location.x < -boxSize/2) {
       location.x = -400;
       velocity.x = velocity.x * -1 * reboundCoeff;
     } 
-    if (location.x > 400) {
+    if (location.x > boxSize/2) {
       location.x = 400;
       velocity.x = velocity.x * -1 * reboundCoeff;
     } 
-    if (location.z < -400) {
+    if (location.z < -boxSize/2) {
       location.z = -400;
       velocity.z = velocity.z * -1 * reboundCoeff;
     } 
-    if (location.z > 400) {
+    if (location.z > boxSize/2) {
       location.z = 400;
       velocity.z = velocity.z * -1 * reboundCoeff;
     }
