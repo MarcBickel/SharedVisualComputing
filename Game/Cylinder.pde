@@ -2,9 +2,10 @@ class Cylinder {
   float cylinderBaseSize = 32;
   float cylinderHeight = 70;
   int cylinderResolution = 40;
-  PShape openCylinder = new PShape();
-  PShape t1 = new PShape();
-  PShape t2 = new PShape();
+  
+  Cylinder() {
+    set();
+  }
   
   void set() {
     float angle;
@@ -17,39 +18,29 @@ class Cylinder {
       x[i] = sin(angle) * cylinderBaseSize;
       y[i] = cos(angle) * cylinderBaseSize;
     }
-  
-    openCylinder = createShape();
-    openCylinder.beginShape(QUAD_STRIP);
-    t1 = createShape();
-    t1.beginShape(TRIANGLE_STRIP);
-    t2 = createShape();
-    t2.beginShape(TRIANGLE_STRIP);
-    t1.vertex(0, 0, 0);
-    t2.vertex(0, cylinderHeight, 0);
     
-    for (int i = 0; i <= x.length; ++i) {
-      t1.vertex(x[i % x.length], 0, y[i % x.length]);
-      t1.vertex(0, 0, 0);
-      t2.vertex(x[i % x.length], cylinderHeight, y[i % x.length]);
-      t2.vertex(0, cylinderHeight, 0);
+    // We do not draw the bottom part of the cylinder since it allows us to save ressources
+    openCylinder.beginShape(QUAD_STRIP);
+    top.beginShape(TRIANGLE_FAN);
+    top.vertex(0, 0, 0);
+    
+    for (int i = 0; i < x.length; ++i) {
+      top.vertex(x[i % x.length], 0, y[i % x.length]);
       if (i < x.length) {
         openCylinder.vertex(x[i], 0, y[i]);
         openCylinder.vertex(x[i], cylinderHeight, y[i]);
-      }
-      
-    }
-    t1.endShape();
-    t2.endShape();
-    openCylinder.endShape();   }
+      }   
+    }    
+    top.endShape();
+    openCylinder.endShape();   
+  }
     
   void drawCylinder(PVector coordinates) { 
-    set();
     pushMatrix();
-    fill(242, 145, 0);
     translate(coordinates.x, - (boxThickness/2 + cylinderHeight), coordinates.y);
     shape(openCylinder);
-    shape(t1);
-    shape(t2);
+    fill(242, 145, 0);
+    shape(top);
     popMatrix();
   }
 }

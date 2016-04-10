@@ -1,11 +1,5 @@
-void settings() {
-  fullScreen(P3D);
-}
-
-void setup() {
-  noStroke();
-  mover = new Mover();
-}
+PShape openCylinder;
+PShape top;
 
 float angleX = 0f;
 float angleZ = 0f;
@@ -26,9 +20,21 @@ enum Mode {
 }
 Mode mode = Mode.GAMER;
 
-Cylinder cylinder = new Cylinder();
+Cylinder cylinder;
 
 ArrayList<PVector> cylinders = new ArrayList();
+
+void settings() {
+  fullScreen(P3D);
+}
+
+void setup() {
+  noStroke();
+  openCylinder = createShape();
+  top = createShape(); 
+  cylinder = new Cylinder();
+  mover = new Mover();
+}
 
 void draw() {
   background(200); 
@@ -47,6 +53,8 @@ void draw() {
       rotateZ(rZ);
       
       //Dessine tous les cylinders en orange
+      
+    fill(242, 145, 0);
       for (PVector vect : cylinders) {
         cylinder.drawCylinder(vect);
       }
