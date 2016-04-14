@@ -1,9 +1,15 @@
 PShape openCylinder;
 PShape top;
 
+PGraphics bottomBackground;
+PGraphics topView;
+PGraphics scoreboard;
+
 float angleX = 0f;
 float angleZ = 0f;
 float rotationSpeed = 0.005f;
+float score = 0f;
+float lastScore = 0f;
 float rX;
 float rZ;
 float cylinderX;
@@ -34,6 +40,9 @@ void setup() {
   top = createShape(); 
   cylinder = new Cylinder();
   mover = new Mover();
+  bottomBackground = createGraphics(width, height/5, P2D);
+  topView = createGraphics(height/5 - 20, height/5 - 20, P2D);
+  scoreboard = createGraphics(width / 5 - 20, height / 5 - 20, P2D);
 }
 
 void draw() {
@@ -41,6 +50,13 @@ void draw() {
   camera();
   directionalLight(255, 240, 224, -1, 12, -9);
   ambientLight(46, 106, 255);
+  
+  drawBottomBackground();
+  image(bottomBackground, 0, height * 4f/5f);
+  drawTopView();
+  image(topView, 10, height * 4f/5f + 10);
+  drawScoreboard();
+  image(scoreboard, height / 5, height * 4f/5f + 10);
   
   switch (mode) {
     case GAMER:
@@ -101,6 +117,39 @@ void drawBoard() {
 
 boolean closerThan(PVector v1, PVector v2, float dist) {
   return dist(v1.x, v1.y, v2.x, v2.y) < dist;
+}
+
+void drawBottomBackground() {
+  bottomBackground.beginDraw();
+  bottomBackground.background(210);
+  bottomBackground.endDraw();
+}
+
+void drawScoreboard() {
+  scoreboard.beginDraw();
+  scoreboard.stroke(5);
+  scoreboard.fill(210);
+  scoreboard.rect(0, 0, width / 5 - 20 - 1, height / 5 - 20 - 1);
+  scoreboard.textSize(22);
+  scoreboard.fill(0);
+  scoreboard.text("Total Score:\n " + score + "\nLast Score:\n " + lastScore + "\nVelocity:\n" + norm(mover.velocity), 0, 0, height / 5, height * 4f/5f + 10);
+
+  scoreboard.endDraw();
+}
+void drawTopView() {
+  topView.beginDraw();
+  topView.background(160);
+  float topViewX = map(mover.location.x, -boxSize/2f, boxSize/2f, 0, height/5f - 20);
+  float topViewY = map(mover.location.z, -boxSize/2f, boxSize/2f, 0, height/5f - 20);
+  topView.fill(255, 0, 0);
+  topView.ellipse(topViewX, topViewY, (height/5f - 20) * 0.05f * 2, (height/5f - 20) * 0.05f * 2);
+  topView.fill(210);
+  for (PVector vect : cylinders) {
+        float topViewCylinderX = map(vect.x, -boxSize/2f, boxSize/2f, 0, height/5f - 20);
+        float topViewCylinderY = map(vect.y, -boxSize/2f, boxSize/2f, 0, height/5f - 20);
+        topView.ellipse(topViewCylinderX, topViewCylinderY, (height/5f - 20) * 1f/25f * 2, (height/5f - 20) * 1f/25f * 2);
+      }
+  topView.endDraw();
 }
 
 void keyPressed() {
@@ -180,4 +229,8 @@ void mouseWheel(MouseEvent event) {
   } else if (rotationSpeed > maxRotationSpeed) {
     rotationSpeed = maxRotationSpeed;
   }
+}
+
+float norm(PVector a) {
+  return (float) Math.sqrt(Math.pow(a.x, 2) + Math.pow(a.y, 2));
 }

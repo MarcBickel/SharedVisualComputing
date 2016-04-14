@@ -6,7 +6,7 @@ class Mover {
   
   float gravityConstant = 0.8;
   float reboundCoeff = 0.8f;
-  float radiusSphere = 40f;
+  float radiusSphere = 1f/20f * boxSize;
   float normalForce = 1;
   float mu = 0.01;
   float frictionMagnitude = normalForce * mu;
@@ -35,22 +35,53 @@ class Mover {
   }
   
   void checkEdges() {
+    float velocity_norm =  (float)Math.sqrt(Math.pow(velocity.x, 2) + Math.pow(velocity.y, 2));
     if (location.x < -boxSize/2) {
-      location.x = -400;
+     
+      if (score > velocity_norm) {
+        score -= velocity_norm;
+        lastScore = velocity_norm;
+      } else {
+        lastScore = - score;
+        score = 0;      
+      }
+      location.x = -boxSize/2;
       velocity.x = velocity.x * -1 * reboundCoeff;
     } 
     if (location.x > boxSize/2) {
-      location.x = 400;
+      if (score > velocity_norm) {
+        score -= velocity_norm;
+        lastScore = velocity_norm;
+      } else {
+        lastScore = - score;
+        score = 0;      
+      }
+      location.x = boxSize/2;
       velocity.x = velocity.x * -1 * reboundCoeff;
     } 
     if (location.z < -boxSize/2) {
-      location.z = -400;
+      if (score > velocity_norm) {
+        score -= velocity_norm;
+        lastScore = velocity_norm;
+      } else {
+        lastScore = - score;
+        score = 0;      
+      }
+      location.z = -boxSize/2;
       velocity.z = velocity.z * -1 * reboundCoeff;
     } 
     if (location.z > boxSize/2) {
-      location.z = 400;
+      if (score > velocity_norm) {
+        score -= velocity_norm;
+        lastScore = velocity_norm;
+      } else {
+        lastScore = - score;
+        score = 0;      
+      }
+      location.z = boxSize/2;
       velocity.z = velocity.z * -1 * reboundCoeff;
     }
+    
   }
   
   void checkCylinderCollision() {
@@ -61,7 +92,8 @@ class Mover {
         normal.normalize();
         velocity.sub(normal.mult(velocity.dot(normal) * 2));
         normal.normalize();
-        
+        score += Math.sqrt((velocity.x * velocity.x) + (velocity.y * velocity.y));
+        lastScore = (float) Math.sqrt((velocity.x * velocity.x) + (velocity.y * velocity.y));        
         location.x = vect.x - normal.x * (cylinder.cylinderBaseSize + radiusSphere + 0.001 * cylinder.cylinderBaseSize);
         location.z = vect.y - normal.z * (cylinder.cylinderBaseSize + radiusSphere + 0.001 * cylinder.cylinderBaseSize);
       }
