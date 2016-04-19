@@ -4,6 +4,7 @@ PShape top;
 PGraphics bottomBackground;
 PGraphics topView;
 PGraphics scoreboard;
+PGraphics barChart;
 
 float angleX = 0f;
 float angleZ = 0f;
@@ -19,6 +20,8 @@ int lastMouseY;
 
 float boxThickness = 24f;
 float boxSize = 800f;
+
+HScrollbar scrollbar;
 
 Mover mover;
 enum Mode {
@@ -43,6 +46,8 @@ void setup() {
   bottomBackground = createGraphics(width, height/5, P2D);
   topView = createGraphics(height/5 - 20, height/5 - 20, P2D);
   scoreboard = createGraphics(width / 5 - 20, height / 5 - 20, P2D);
+  barChart = createGraphics(4 * width / 5 - height / 5 - 20, height / 5 - 20 - 30, P2D);
+  scrollbar = new HScrollbar(height / 5 + width / 5, height - 30 - 5, 600, 30);
 }
 
 void draw() {
@@ -57,6 +62,10 @@ void draw() {
   image(topView, 10, height * 4f/5f + 10);
   drawScoreboard();
   image(scoreboard, height / 5, height * 4f/5f + 10);
+  drawBarChart();
+  image(barChart, height /5 + width / 5, height * 4f/5f + 10);
+  scrollbar.update();
+  scrollbar.display();
   
   switch (mode) {
     case GAMER:
@@ -146,11 +155,21 @@ void drawScoreboard() {
   scoreboard.stroke(5);
   scoreboard.fill(210);
   scoreboard.rect(0, 0, width / 5 - 20 - 1, height / 5 - 20 - 1);
-  scoreboard.textSize(22);
+  scoreboard.textSize(22f * height/1080f);
   scoreboard.fill(0);
   scoreboard.text("Total Score:\n " + score + "\nLast Score:\n " + lastScore + "\nVelocity:\n" + norm(mover.velocity), 0, 0, height / 5, height * 4f/5f + 10);
 
   scoreboard.endDraw();
+}
+
+void drawBarChart() {
+  barChart.stroke(10);
+  float rectSize = 50;
+  barChart.beginDraw();
+  barChart.background(160);
+  barChart.fill(0, 0, 255);
+  barChart.rect(barChart.width/2, barChart.height/2, rectSize, rectSize);
+  barChart.endDraw();
 }
 
 void keyPressed() {
