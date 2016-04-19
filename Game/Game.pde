@@ -125,17 +125,6 @@ void drawBottomBackground() {
   bottomBackground.endDraw();
 }
 
-void drawScoreboard() {
-  scoreboard.beginDraw();
-  scoreboard.stroke(5);
-  scoreboard.fill(210);
-  scoreboard.rect(0, 0, width / 5 - 20 - 1, height / 5 - 20 - 1);
-  scoreboard.textSize(22);
-  scoreboard.fill(0);
-  scoreboard.text("Total Score:\n " + score + "\nLast Score:\n " + lastScore + "\nVelocity:\n" + norm(mover.velocity), 0, 0, height / 5, height * 4f/5f + 10);
-
-  scoreboard.endDraw();
-}
 void drawTopView() {
   topView.beginDraw();
   topView.background(160);
@@ -150,6 +139,18 @@ void drawTopView() {
         topView.ellipse(topViewCylinderX, topViewCylinderY, (height/5f - 20) * 1f/25f * 2, (height/5f - 20) * 1f/25f * 2);
       }
   topView.endDraw();
+}
+
+void drawScoreboard() {
+  scoreboard.beginDraw();
+  scoreboard.stroke(5);
+  scoreboard.fill(210);
+  scoreboard.rect(0, 0, width / 5 - 20 - 1, height / 5 - 20 - 1);
+  scoreboard.textSize(22);
+  scoreboard.fill(0);
+  scoreboard.text("Total Score:\n " + score + "\nLast Score:\n " + lastScore + "\nVelocity:\n" + norm(mover.velocity), 0, 0, height / 5, height * 4f/5f + 10);
+
+  scoreboard.endDraw();
 }
 
 void keyPressed() {
