@@ -17,6 +17,10 @@ float cylinderX;
 float cylinderY;
 int lastMouseX;
 int lastMouseY;
+int timer;
+float barChartIntervalTimeRefresh = 0.5; //Time in seconds for the barChart to be refreshed
+int maxWidthBarChart = 50; //Size of the bars in the chart
+int scale = 1; //Scale of the barchart, for vertical resizing
 
 float boxThickness = 24f;
 float boxSize = 800f;
@@ -32,6 +36,7 @@ Mode mode = Mode.GAMER;
 Cylinder cylinder;
 
 ArrayList<PVector> cylinders = new ArrayList();
+ArrayList<Float> scores = new ArrayList();
 
 void settings() {
   fullScreen(P3D);
@@ -48,6 +53,7 @@ void setup() {
   scoreboard = createGraphics(width / 5 - 20, height / 5 - 20, P2D);
   barChart = createGraphics(4 * width / 5 - height / 5 - 20, height / 5 - 20 - 30, P2D);
   scrollbar = new HScrollbar(height / 5 + width / 5, height - 30 - 5, 600, 30);
+  timer = 0;
 }
 
 void draw() {
@@ -56,19 +62,13 @@ void draw() {
   directionalLight(255, 240, 224, -1, 12, -9);
   ambientLight(46, 106, 255);
   
-  drawBottomBackground();
-  image(bottomBackground, 0, height * 4f/5f);
-  drawTopView();
-  image(topView, 10, height * 4f/5f + 10);
-  drawScoreboard();
-  image(scoreboard, height / 5, height * 4f/5f + 10);
-  drawBarChart();
-  image(barChart, height /5 + width / 5, height * 4f/5f + 10);
-  scrollbar.update();
-  scrollbar.display();
-  
   switch (mode) {
     case GAMER:
+      timer = (timer + 1);
+      if (timer >= barChartIntervalTimeRefresh * 60) {
+        timer = 0;
+        scores.add(score);
+      }
       pushMatrix();
       rX = map(angleX, -1, 1, -PI / 3, PI / 3);
       rZ = map(angleZ, -1, 1, -PI / 3, PI / 3);
@@ -79,7 +79,7 @@ void draw() {
       
       //Dessine tous les cylinders en orange
       
-    fill(242, 145, 0);
+      fill(242, 145, 0);
       for (PVector vect : cylinders) {
         cylinder.drawCylinder(vect);
       }
@@ -87,13 +87,41 @@ void draw() {
       // Dessine la plaque en vert
       drawBoard();
       
+      
+      /*pushMatrix();
+      translate(-boxSize/2 - (width - boxSize) / 2, -boxThickness/2, boxSize/2 + 1);
+      drawBottomBackground();
+      image(bottomBackground, 0, 0);
+      drawTopView();
+      image(topView, 0, 0);
+      drawScoreboard();
+      image(scoreboard, height / 5, 0);
+      drawBarChart();
+      image(barChart, 2 * height /5, 0);
+      scrollbar.update();
+      scrollbar.display();
+      popMatrix(); */
+      
       // Dessine la boule en rouge
       mover.update();
       mover.checkEdges();
       mover.checkCylinderCollision();
       mover.display();
       popMatrix();
+      
+      //Dessine tous les éléments de la week 6
+      drawBottomBackground();
+      image(bottomBackground, 0, height * 4f/5f);
+      drawTopView();
+      image(topView, 10, height * 4f/5f + 10);
+      drawScoreboard();
+      image(scoreboard, height / 5, height * 4f/5f + 10);
+      drawBarChart();
+      image(barChart, height /5 + width / 5, height * 4f/5f + 10);
+      scrollbar.update();
+      scrollbar.display();
       break;
+      
     case PLACER:       
       pushMatrix();
       
@@ -164,11 +192,15 @@ void drawScoreboard() {
 
 void drawBarChart() {
   barChart.stroke(10);
-  float rectSize = 50;
   barChart.beginDraw();
   barChart.background(160);
   barChart.fill(0, 0, 255);
-  barChart.rect(barChart.width/2, barChart.height/2, rectSize, rectSize);
+  if (scores.size() > 1 && (scores.get(scores.size() - 1) >= (barChart.height - 5) * scale)) {
+    scale = scale * 2;
+  }
+  for (int i = 0; i < scores.size(); ++i) {
+    barChart.rect(i * (maxWidthBarChart + 2) * (scrollbar.getPos() + 0.1), (barChart.height - scores.get(i)) * scale - 5, maxWidthBarChart * scrollbar.getPos() + 0.1, scores.get(i) / scale);
+  }
   barChart.endDraw();
 }
 
@@ -187,15 +219,17 @@ void keyReleased() {
 void mouseDragged() {
   switch (mode) {
     case GAMER:
-      // modifies the value of angleX, angleZ from -1 to 1
-      angleZ += (mouseX - lastMouseX) * rotationSpeed;
-      angleX -= (mouseY - lastMouseY) * rotationSpeed;
-      if (angleX > 1) angleX = 1;
-      if (angleX < -1) angleX = -1;
-      if (angleZ > 1) angleZ = 1;
-      if (angleZ < -1) angleZ = -1;
-      lastMouseX = mouseX;
-      lastMouseY = mouseY;
+      if (lastMouseY < 4 * height / 5) {
+        // modifies the value of angleX, angleZ from -1 to 1
+        angleZ += (mouseX - lastMouseX) * rotationSpeed;
+        angleX -= (mouseY - lastMouseY) * rotationSpeed;
+        if (angleX > 1) angleX = 1;
+        if (angleX < -1) angleX = -1;
+        if (angleZ > 1) angleZ = 1;
+        if (angleZ < -1) angleZ = -1;
+        lastMouseX = mouseX;
+        lastMouseY = mouseY;
+      }
       break;
     case PLACER:
       break;
