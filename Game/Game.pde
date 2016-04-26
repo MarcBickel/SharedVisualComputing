@@ -199,7 +199,7 @@ void drawBarChart() {
     scale = scale * 2;
   }
   for (int i = 0; i < scores.size(); ++i) {
-    barChart.rect(i * (maxWidthBarChart + 2) * (scrollbar.getPos() + 0.1), (barChart.height - scores.get(i)) * scale - 5, maxWidthBarChart * scrollbar.getPos() + 0.1, scores.get(i) / scale);
+    barChart.rect(i * (maxWidthBarChart + 2) * (scrollbar.getPos() + 0.1), (barChart.height - scores.get(i) / scale) - 5, maxWidthBarChart * scrollbar.getPos() + 0.1, scores.get(i) / scale);
   }
   barChart.endDraw();
 }
