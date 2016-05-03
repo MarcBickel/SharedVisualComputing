@@ -87,21 +87,6 @@ void draw() {
       // Dessine la plaque en vert
       drawBoard();
       
-      
-      /*pushMatrix();
-      translate(-boxSize/2 - (width - boxSize) / 2, -boxThickness/2, boxSize/2 + 1);
-      drawBottomBackground();
-      image(bottomBackground, 0, 0);
-      drawTopView();
-      image(topView, 0, 0);
-      drawScoreboard();
-      image(scoreboard, height / 5, 0);
-      drawBarChart();
-      image(barChart, 2 * height /5, 0);
-      scrollbar.update();
-      scrollbar.display();
-      popMatrix(); */
-      
       // Dessine la boule en rouge
       mover.update();
       mover.checkEdges();
