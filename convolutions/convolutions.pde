@@ -130,12 +130,10 @@ PImage sobel (PImage img) {
     result.pixels[i] = color(0);
   }
   float[] buffer = convolute2(img);
-  
-  
-    
+      
   for (int y = 1; y < img.height - 1; y++) { // Skip top and bottom edges
     for (int x = 1; x < img.width - 1; x++) { // Skip left and right
-      if (buffer[y * img.width + x] > (int)(max * 0.3f)) { // 30% of the max
+      if (buffer[y * img.width + x] > (int)(max * 0.11)) { // 11% of the max
         result.pixels[y * img.width + x] = color(255);
       } else {
         result.pixels[y * img.width + x] = color(0);
