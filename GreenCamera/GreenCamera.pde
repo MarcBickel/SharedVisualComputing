@@ -1,17 +1,32 @@
+import processing.video.*;
+Capture cam;
 PImage img;
 
 void settings() {
-  size(800, 600);
+  size(640, 480);
 }
 
 void setup() {
-  img = loadImage("board1.jpg");
+  String[] cameras = Capture.list();
+  if (cameras.length == 0) {
+    println("There are no cameras available for capture.");
+    exit();
+  } else {
+    println("Available cameras:");
+    for (int i = 0; i < cameras.length; i++) {
+      println(cameras[i]);
+    }
+
+    cam = new Capture(this, cameras[0]);
+    cam.start();
+  }
 }
 
-void draw() {
-  PImage image = sobel(gaussianBlur(colorThresholding(img)));
-  //image(image, 0, 0);
-  hough(image);
+void draw() {if (cam.available() == true) {
+    cam.read();
+  }
+  img = cam.get();
+  image(sobel(gaussianBlur(colorThresholding(img))), 0, 0);
 }
 
 float computeWeight(float[][] tab) {
@@ -124,49 +139,5 @@ PImage sobel(PImage img) {
   }
 
   return result;
-}
-
-void hough(PImage edgeImg) {
-  float discretizationStepsPhi = 0.06f;
-  float discretizationStepsR = 2.5f;
   
-  // dimensions of the accumulator
-  int phiDim = (int) (Math.PI / discretizationStepsPhi);
-  int rDim = (int) (((edgeImg.width + edgeImg.height) * 2 + 1) / discretizationStepsR);
-  
-  // our accumulator (with a 1 pix margin around)
-  int[] accumulator = new int[(phiDim + 2) * (rDim + 2)];
-  
-  // Fill the accumulator: on edge points (ie, white pixels of the edge
-  // image), store all possible (r, phi) pairs describing lines going
-  // through the point.
-  for (int y = 0; y < edgeImg.height; y++) {
-    for (int x = 0; x < edgeImg.width; x++) {
-    // Are we on an edge?
-      if (brightness(edgeImg.pixels[y * edgeImg.width + x]) != 0) {
-        for (float phi = 0f; phi < Math.PI; phi = phi + discretizationStepsPhi) {
-          float r = x * cos(phi) + y * sin(phi);
-          if (r < 0) {
-            r += (rDim - 1) / 2;
-          }
-          int currentPhi = (int) (phi / discretizationStepsPhi);
-          int currentR = (int) (r / discretizationStepsR);
-          //if (currentR < 0) {
-            //currentR += (rDim -1) /2;
-          //}
-          accumulator[currentPhi * rDim + currentR] += 1;
-        }
-        
-      }
-    }
-  }
-  
-  PImage houghImg = createImage(rDim + 2, phiDim + 2, ALPHA);
-  for (int i = 0; i < accumulator.length; i++) {
-    houghImg.pixels[i] = color(min(255, accumulator[i]));
-  }
-  // You may want to resize the accumulator to make it easier to see:
-  houghImg.resize(800, 600);
-  houghImg.updatePixels();
-  image(houghImg, 0, 0);
 }
