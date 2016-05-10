@@ -1,3 +1,5 @@
+import java.util.Collections;
+
 PImage img;
 
 void settings() {
@@ -6,12 +8,13 @@ void settings() {
 
 void setup() {
   img = loadImage("board1.jpg");
+  noLoop();
 }
 
 void draw() {
   PImage image = sobel(gaussianBlur(colorThresholding(img)));
   image(img, 0, 0);
-  hough(image);
+  hough(image, 4);
 }
 
 float computeWeight(float[][] tab) {
@@ -31,7 +34,7 @@ PImage colorThresholding(PImage img) {
   for (int i = 0; i < img.width * img.height; ++i) {
     int current = img.pixels[i];
     if (hue(current) < 136 && hue(current) > 96 && saturation(current) > 50 && brightness(current) > 25) { //works for green only
-      result.pixels[i] = color(current);
+      result.pixels[i] = color(255);
     } else {
       result.pixels[i] = 0;
     }
@@ -126,7 +129,7 @@ PImage sobel(PImage img) {
   return result;
 }
 
-void hough(PImage edgeImg) {
+void hough(PImage edgeImg, int nLines) {
   float discretizationStepsPhi = 0.06f;
   float discretizationStepsR = 2.5f;
   
@@ -157,6 +160,7 @@ void hough(PImage edgeImg) {
     }
   }
   
+  
   //To display the accumulator
   /*PImage houghImg = createImage(rDim + 2, phiDim + 2, ALPHA);
   for (int i = 0; i < accumulator.length; i++) {
@@ -167,9 +171,49 @@ void hough(PImage edgeImg) {
   houghImg.updatePixels();
   image(houghImg, 0, 0);*/
   
-  for (int idx = 0; idx < accumulator.length; idx++) {
-    if (accumulator[idx] > 200) {
-      
+  //Adding the candidates that have more than a certain threshlod of votes
+  ArrayList<Integer> bestCandidates = new ArrayList();
+  
+  // size of the region we search for a local maximum
+  int neighbourhood = 10;
+  // only search around lines with more that this amount of votes
+  // (to be adapted to your image)
+  int minVotes = 200;
+  for (int accR = 0; accR < rDim; accR++) {
+    for (int accPhi = 0; accPhi < phiDim; accPhi++) {
+      // compute current index in the accumulator
+      int idx = (accPhi + 1) * (rDim + 2) + accR + 1;
+      if (accumulator[idx] > minVotes) {
+        boolean bestCandidate=true;
+        // iterate over the neighbourhood
+        for(int dPhi=-neighbourhood/2; dPhi < neighbourhood/2+1; dPhi++) {
+          // check we are not outside the image
+          if( accPhi+dPhi < 0 || accPhi+dPhi >= phiDim) continue;
+          for(int dR=-neighbourhood/2; dR < neighbourhood/2 +1; dR++) {// check we are not outside the image
+            if(accR+dR < 0 || accR+dR >= rDim) continue;
+            int neighbourIdx = (accPhi + dPhi + 1) * (rDim + 2) + accR + dR + 1;
+            if(accumulator[idx] < accumulator[neighbourIdx]) {
+              // the current idx is not a local maximum!
+              bestCandidate=false;
+              break;
+            }
+          }
+          if(!bestCandidate) break;
+        }
+        if(bestCandidate) {
+        // the current idx *is* a local maximum
+        bestCandidates.add(idx);
+        }
+      }
+    }
+  }
+  
+  //Sorting them by most votes
+  Collections.sort(bestCandidates, new HoughComparator(accumulator));
+
+  if (bestCandidates.size() > nLines) {
+    for (int id = 0; id < nLines; id++) {
+      int idx = bestCandidates.get(id);
       // first, compute back the (r, phi) polar coordinates:
       int accPhi = (int) (idx / (rDim + 2)) - 1;
       int accR = idx - (accPhi + 1) * (rDim + 2) - 1;
@@ -213,6 +257,7 @@ void hough(PImage edgeImg) {
           line(x2, y2, x3, y3);
         }
       }
+    
     }
   }
 }
