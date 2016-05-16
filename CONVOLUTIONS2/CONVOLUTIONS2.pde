@@ -8,12 +8,12 @@ void settings() {
 
 void setup() {
   img = loadImage("board1.jpg");
-  noLoop();
+  //noLoop();
 }
 
 void draw() {
-  PImage image = sobel(gaussianBlur(colorThresholding(img)));
-  image(img, 0, 0);
+  PImage image = sobel(antiGaussianBlur(colorThresholding(img)));
+  image(image, 0, 0);
   hough(image, 4);
 }
 
@@ -33,7 +33,7 @@ PImage colorThresholding(PImage img) {
   
   for (int i = 0; i < img.width * img.height; ++i) {
     int current = img.pixels[i];
-    if (hue(current) < 136 && hue(current) > 96 && saturation(current) > 50 && brightness(current) > 25) { //works for green only
+    if (hue(current) < 139 && hue(current) > 96 && saturation(current) > 112 && brightness(current) > 25) { //works for green only
       result.pixels[i] = color(255);
     } else {
       result.pixels[i] = 0;
@@ -73,6 +73,38 @@ PImage gaussianBlur(PImage img) {
   return result;
 }
 
+PImage antiGaussianBlur(PImage img) {
+  
+  float[][] kernel = {
+    {10f, 10f, 10f, 10f, 10f},
+    {10f , 5f, 5f, 5f, 10f },
+    {10f, 5f, 0f, 5f, 10f},
+    {10f , 5f, 5f, 5f, 10f }, 
+    {10f, 10f, 10f, 10f, 10f}
+  };
+  
+  float weight = computeWeight(kernel);
+  PImage result = createImage(img.width, img.height, ALPHA);
+  
+  for (int x = 2; x < (img.width - 2); ++x) {
+    for (int y = 2; y < (img.height - 2); ++y) {
+      
+      float value = 0;
+      //Now we iterate over the kernel
+      for (int i = -2; i < 3; ++i) {
+        for (int j = -2; j < 3; ++j) {
+          value += brightness(img.pixels[(x + i) + (y + j) * img.width]) * kernel[i + 2][j + 2];
+        }
+      }
+      if (value / weight > 160) {
+        result.pixels[x + y * img.width] = color(value / weight);
+      }
+    }
+  }
+  
+  return result;
+}
+
 PImage sobel(PImage img) {
   float[][] hKernel = { 
     { 0, 1 , 0 },
@@ -92,7 +124,6 @@ PImage sobel(PImage img) {
   for (int i = 0; i < img.width * img.height; i++) {
     result.pixels[i] = color(0);
   }
-
   
   float max = 0;
   float[] buffer = new float[img.width * img.height];
@@ -130,7 +161,7 @@ PImage sobel(PImage img) {
 }
 
 void hough(PImage edgeImg, int nLines) {
-  float discretizationStepsPhi = 0.06f;
+  float discretizationStepsPhi = 0.01f;
   float discretizationStepsR = 2.5f;
   
   // dimensions of the accumulator
@@ -159,17 +190,20 @@ void hough(PImage edgeImg, int nLines) {
       }
     }
   }
-  
-  
+   
   //To display the accumulator
-  /*PImage houghImg = createImage(rDim + 2, phiDim + 2, ALPHA);
+  PImage houghImg = createImage(rDim + 2, phiDim + 2, RGB);
   for (int i = 0; i < accumulator.length; i++) {
-    houghImg.pixels[i] = color(min(255, accumulator[i]));
+    if (accumulator[i] > 200) {
+      houghImg.pixels[i] = color(255, 0, 0); 
+    } else {
+      houghImg.pixels[i] = color(min(255, accumulator[i]));
+    }
   }
   // You may want to resize the accumulator to make it easier to see:
   houghImg.resize(800, 600);
   houghImg.updatePixels();
-  image(houghImg, 0, 0);*/
+  image(houghImg, 0, 0);
   
   //Adding the candidates that have more than a certain threshlod of votes
   ArrayList<Integer> bestCandidates = new ArrayList();
