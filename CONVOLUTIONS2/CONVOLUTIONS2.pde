@@ -1,4 +1,5 @@
 import java.util.Collections;
+import java.util.List;
 
 PImage img;
 
@@ -7,14 +8,14 @@ void settings() {
 }
 
 void setup() {
-    img = loadImage("board4.jpg");
+    img = loadImage("board1.jpg");
     noLoop();
 }
 
 void draw() {
     PImage image = sobel(antiGaussianBlur(colorThresholding(img)));
     image(image, 0, 0);
-    hough(image, 4);
+    getIntersections(hough(image, 4));
 }
 
 float computeWeight(float[][] tab) {
@@ -160,7 +161,7 @@ PImage sobel(PImage img) {
     return result;
 }
 
-void hough(PImage edgeImg, int nLines) {
+ArrayList<PVector> hough(PImage edgeImg, int nLines) {
     float discretizationStepsPhi = 0.01f;
     float discretizationStepsR = 2.5f;
 
@@ -209,12 +210,6 @@ void hough(PImage edgeImg, int nLines) {
     //Adding the candidates that have more than a certain threshlod of votes
     ArrayList<Integer> bestCandidates = new ArrayList();
 
-    /*for (int i = 0; i < accumulator.length; ++i) {
-      if (accumulator[i] > 200) {
-        bestCandidates.add(i);
-      }
-    }*/
-
     // size of the region we search for a local maximum
     int neighbourhood = 10;
     // only search around lines with more that this amount of votes
@@ -251,6 +246,9 @@ void hough(PImage edgeImg, int nLines) {
 
     //Sorting them by most votes
     Collections.sort(bestCandidates, new HoughComparator(accumulator));
+    
+    //The return list
+    ArrayList<PVector> result = new ArrayList();
 
     for (int id = 0; id < min(nLines, bestCandidates.size()); id++) {
         int idx = bestCandidates.get(id);
@@ -259,6 +257,7 @@ void hough(PImage edgeImg, int nLines) {
         int accR = idx - (accPhi + 1) * (rDim + 2) - 1;
         float r = (accR - (rDim - 1) * 0.5f) * discretizationStepsR;
         float phi = accPhi * discretizationStepsPhi;
+        result.add(new PVector(r, phi));
 
         // Cartesian equation of a line: y = ax + b
         // in polar, y = (-cos(phi)/sin(phi))x + (r/sin(phi))
@@ -299,4 +298,25 @@ void hough(PImage edgeImg, int nLines) {
         }
 
     }
+    return result;
+}
+
+ArrayList<PVector> getIntersections(List<PVector> lines) {
+  ArrayList<PVector> intersections = new ArrayList<PVector>();
+  for (int i = 0; i < lines.size() - 1; i++) {
+    PVector line1 = lines.get(i);
+    for (int j = i + 1; j < lines.size(); j++) {
+      PVector line2 = lines.get(j);
+      // compute the intersection and add it to ’intersections’
+      float d = cos(line2.y) * sin(line1.y) - cos(line1.y) * sin(line2.y);
+      
+      float x = (line2.x * sin(line1.y) - line1.x * sin(line2.y)) / d;
+      float y = (-line2.x * cos(line1.y) + line1.x * cos(line2.y)) / d;
+      
+      // draw the intersection
+      fill(255, 128, 0);
+      ellipse(x, y, 10, 10);
+    }
+  }
+  return intersections;
 }
