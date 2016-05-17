@@ -8,14 +8,14 @@ void settings() {
 }
 
 void setup() {
-    img = loadImage("board4.jpg");
-    noLoop();
+    img = loadImage("board1.jpg");
+    //noLoop();
 }
 
 void draw() {
-    PImage image = sobel(antiGaussianBlur(colorThresholding(img)));
+    PImage image = sobel(antiGaussianBlur(intensityThresholding(gaussianBlur(colorThresholding(img)))));
     image(image, 0, 0);
-    getIntersections(hough(image, 4));
+    getIntersections(hough(image, 6));
 }
 
 float computeWeight(float[][] tab) {
@@ -35,6 +35,21 @@ PImage colorThresholding(PImage img) {
     for (int i = 0; i < img.width * img.height; ++i) {
         int current = img.pixels[i];
         if (hue(current) < 139 && hue(current) > 96 && saturation(current) > 112 && brightness(current) > 25) { //works for green only
+            result.pixels[i] = color(255);
+        } else {
+            result.pixels[i] = 0;
+        }
+    }
+
+    return result;
+}
+
+PImage intensityThresholding(PImage img) {
+  PImage result = createImage(img.width, img.height, RGB);
+  
+  for (int i = 0; i < img.width * img.height; ++i) {
+        int current = img.pixels[i];
+        if ( brightness(current) > 25) {
             result.pixels[i] = color(255);
         } else {
             result.pixels[i] = 0;
