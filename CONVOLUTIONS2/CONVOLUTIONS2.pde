@@ -8,7 +8,7 @@ void settings() {
 }
 
 void setup() {
-    img = loadImage("board1.jpg");
+    img = loadImage("board4.jpg");
     noLoop();
 }
 
@@ -171,6 +171,17 @@ ArrayList<PVector> hough(PImage edgeImg, int nLines) {
 
     // our accumulator (with a 1 pix margin around)
     int[] accumulator = new int[(phiDim + 2) * (rDim + 2)];
+    
+    // pre-compute the sin and cos values
+    float[] tabSin = new float[phiDim];
+    float[] tabCos = new float[phiDim];
+    float ang = 0;
+    float inverseR = 1.f / discretizationStepsR;
+    for (int accPhi = 0; accPhi < phiDim; ang += discretizationStepsPhi, accPhi++) {
+      // we can also pre-multiply by (1/discretizationStepsR) since we need it in the Hough loop
+      tabSin[accPhi] = (float) Math.sin(ang);
+      tabCos[accPhi] = (float) Math.cos(ang);
+    }
 
     // Fill the accumulator: on edge points (ie, white pixels of the edge
     // image), store all possible (r, phi) pairs describing lines going
@@ -181,7 +192,7 @@ ArrayList<PVector> hough(PImage edgeImg, int nLines) {
             if (brightness(edgeImg.pixels[y * edgeImg.width + x]) != 0) {
                 for (int phi = 0; phi < phiDim; ++phi) {
                     float phiF = phi * discretizationStepsPhi;
-                    float rF = x * cos(phiF) + y * sin(phiF);
+                    float rF = x * tabCos[phi] + y * tabSin[phi];
 
                     int r = (int) (rF / discretizationStepsR);
                     r += (rDim -1) /2;
