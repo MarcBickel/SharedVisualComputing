@@ -7,8 +7,8 @@ void settings() {
 }
 
 void setup() {
-  img = loadImage("board1.jpg");
-  //noLoop();
+  img = loadImage("board4.jpg");
+  noLoop();
 }
 
 void draw() {
@@ -190,11 +190,12 @@ void hough(PImage edgeImg, int nLines) {
       }
     }
   }
-   
+     
   //To display the accumulator
-  PImage houghImg = createImage(rDim + 2, phiDim + 2, RGB);
+/* PImage houghImg = createImage(rDim + 2, phiDim + 2, RGB);
   for (int i = 0; i < accumulator.length; i++) {
-    if (accumulator[i] > 200) {
+    if (accumulator[i] > 190) {
+      count++;
       houghImg.pixels[i] = color(255, 0, 0); 
     } else {
       houghImg.pixels[i] = color(min(255, accumulator[i]));
@@ -203,10 +204,16 @@ void hough(PImage edgeImg, int nLines) {
   // You may want to resize the accumulator to make it easier to see:
   houghImg.resize(800, 600);
   houghImg.updatePixels();
-  image(houghImg, 0, 0);
-  
+  image(houghImg, 0, 0);*/
+    
   //Adding the candidates that have more than a certain threshlod of votes
   ArrayList<Integer> bestCandidates = new ArrayList();
+  
+  /*for (int i = 0; i < accumulator.length; ++i) {
+    if (accumulator[i] > 200) {
+      bestCandidates.add(i);
+    }
+  }*/
   
   // size of the region we search for a local maximum
   int neighbourhood = 10;
@@ -245,8 +252,7 @@ void hough(PImage edgeImg, int nLines) {
   //Sorting them by most votes
   Collections.sort(bestCandidates, new HoughComparator(accumulator));
 
-  if (bestCandidates.size() > nLines) {
-    for (int id = 0; id < nLines; id++) {
+    for (int id = 0; id < min(nLines, bestCandidates.size()); id++) {
       int idx = bestCandidates.get(id);
       // first, compute back the (r, phi) polar coordinates:
       int accPhi = (int) (idx / (rDim + 2)) - 1;
@@ -293,5 +299,4 @@ void hough(PImage edgeImg, int nLines) {
       }
     
     }
-  }
 }
