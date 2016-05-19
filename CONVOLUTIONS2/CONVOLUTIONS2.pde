@@ -3,22 +3,29 @@ import java.util.List;
 import java.util.Random;
 
 PImage img;
+int[] accumulator;
+
+//To draw the hough accumulator
+int phiDim;
+int rDim;
 
 void settings() {
-    size(800, 600);
+    size(800 + 600 + 800, 600);
 }
 
 void setup() {
-    img = loadImage("board3.jpg");
-    //noLoop();
+    img = loadImage("board1.jpg");
+    noLoop();
 }
 
 void draw() {
     PImage image = sobel(antiGaussianBlur(intensityThresholding(gaussianBlur(colorThresholding(img)))));
-    image(image, 0, 0);
-    ArrayList<PVector> swag = hough(image, 300);
-    getIntersections(swag);
-    displayQuads(swag);
+    image(img, 0, 0);
+    ArrayList<PVector> houghImage = hough(image, 4);
+    getIntersections(houghImage);
+    image(image, 800 + 400, 0);
+    displayAccumulator(accumulator);
+    //displayQuads(houghImage);
 }
 
 float computeWeight(float[][] tab) {
@@ -184,17 +191,16 @@ ArrayList<PVector> hough(PImage edgeImg, int nLines) {
     float discretizationStepsR = 2.5f;
 
     // dimensions of the accumulator
-    int phiDim = (int) (Math.PI / discretizationStepsPhi);
-    int rDim = (int) (((edgeImg.width + edgeImg.height) * 2 + 1) / discretizationStepsR);
+    phiDim = (int) (Math.PI / discretizationStepsPhi);
+    rDim = (int) (((edgeImg.width + edgeImg.height) * 2 + 1) / discretizationStepsR);
 
     // our accumulator (with a 1 pix margin around)
-    int[] accumulator = new int[(phiDim + 2) * (rDim + 2)];
+    accumulator = new int[(phiDim + 2) * (rDim + 2)];
     
     // pre-compute the sin and cos values
     float[] tabSin = new float[phiDim];
     float[] tabCos = new float[phiDim];
     float ang = 0;
-    float inverseR = 1.f / discretizationStepsR;
     for (int accPhi = 0; accPhi < phiDim; ang += discretizationStepsPhi, accPhi++) {
       // we can also pre-multiply by (1/discretizationStepsR) since we need it in the Hough loop
       tabSin[accPhi] = (float) Math.sin(ang);
@@ -221,20 +227,6 @@ ArrayList<PVector> hough(PImage edgeImg, int nLines) {
         }
     }
 
-    //To display the accumulator
-    /* PImage houghImg = createImage(rDim + 2, phiDim + 2, RGB);
-      for (int i = 0; i < accumulator.length; i++) {
-        if (accumulator[i] > 190) {
-          count++;
-          houghImg.pixels[i] = color(255, 0, 0);
-        } else {
-          houghImg.pixels[i] = color(min(255, accumulator[i]));
-        }
-      }
-      // You may want to resize the accumulator to make it easier to see:
-      houghImg.resize(800, 600);
-      houghImg.updatePixels();
-      image(houghImg, 0, 0);*/
 
     //Adding the candidates that have more than a certain threshlod of votes
     ArrayList<Integer> bestCandidates = new ArrayList();
@@ -330,6 +322,19 @@ ArrayList<PVector> hough(PImage edgeImg, int nLines) {
     return result;
 }
 
+void displayAccumulator(int[] accumulator) {
+  
+    //To display the accumulator
+    PImage houghImg = createImage(rDim + 2, phiDim + 2, ALPHA);
+      for (int i = 0; i < accumulator.length; i++) {
+        houghImg.pixels[i] = color(min(255, accumulator[i]));
+      }
+      // You may want to resize the accumulator to make it easier to see:
+      houghImg.resize(400, 600);
+      houghImg.updatePixels();
+      image(houghImg, 800, 0);
+}
+
 ArrayList<PVector> getIntersections(List<PVector> lines) {
   ArrayList<PVector> intersections = new ArrayList<PVector>();
   for (int i = 0; i < lines.size() - 1; i++) {
@@ -361,9 +366,9 @@ PVector intersection(PVector v1, PVector v2) {
 
 void displayQuads(ArrayList<PVector> lines) {
   
-  QuadGraph djYoloSwag2000 = new QuadGraph();
-  djYoloSwag2000.build(lines, width, height);
-  List<int[]> quads = djYoloSwag2000.findCycles(); 
+  QuadGraph quadGraph = new QuadGraph();
+  quadGraph.build(lines, width, height);
+  List<int[]> quads = quadGraph.findCycles(); 
   
   for (int[] quad : quads) {
     PVector l1 = lines.get(quad[0]);
@@ -378,7 +383,7 @@ void displayQuads(ArrayList<PVector> lines) {
     PVector c34 = intersection(l3, l4);
     PVector c41 = intersection(l4, l1);
     
-    if (djYoloSwag2000.isConvex(c12, c23, c34, c41) && djYoloSwag2000.validArea(c12, c23, c34, c41, 1920 * 1920, 20 * 20) && djYoloSwag2000.nonFlatQuad(c12, c23, c34, c41)) {
+    if (quadGraph.isConvex(c12, c23, c34, c41) && quadGraph.validArea(c12, c23, c34, c41, 1920 * 1920, 20 * 20) && quadGraph.nonFlatQuad(c12, c23, c34, c41)) {
       // Choose a random, semi-transparent colour
       Random random = new Random();
       fill(color(min(255, random.nextInt(300)),
