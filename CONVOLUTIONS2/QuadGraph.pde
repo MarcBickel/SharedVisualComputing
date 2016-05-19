@@ -79,24 +79,17 @@ class QuadGraph {
 
     for (int i = 0; i < graph.length; i++)
       for (int y = 0; y <= 1; y++)
-        if (graph[i][y] == n)
-          //  edge refers to our current node
-        {
+        if (graph[i][y] == n) { //  edge refers to our current node
           x = graph[i][(y + 1) % 2];
-          if (!visited(x, path))
-            //  neighbor node not on path yet
-          {
+          if (!visited(x, path)) { //  neighbor node not on path yet
             sub[0] = x;
             System.arraycopy(path, 0, sub, 1, path.length);
             //  explore extended path
             findNewCycles(sub);
-          } else if ((path.length == 4) && (x == path[path.length - 1]))
-            //  cycle found
-          {
+          } else if ((path.length == 4) && (x == path[path.length - 1])) { //  cycle found
             int[] p = normalize(path);
             int[] inv = invert(p);
-            if (isNew(p) && isNew(inv))
-            {
+            if (isNew(p) && isNew(inv)) {
               cycles.add(p);
             }
           }

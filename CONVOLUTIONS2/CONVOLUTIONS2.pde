@@ -9,14 +9,16 @@ void settings() {
 }
 
 void setup() {
-    img = loadImage("board1.jpg");
+    img = loadImage("board3.jpg");
     //noLoop();
 }
 
 void draw() {
     PImage image = sobel(antiGaussianBlur(intensityThresholding(gaussianBlur(colorThresholding(img)))));
     image(image, 0, 0);
-    getIntersections(hough(image, 6));
+    ArrayList<PVector> swag = hough(image, 300);
+    getIntersections(swag);
+    displayQuads(swag);
 }
 
 float computeWeight(float[][] tab) {
@@ -343,12 +345,26 @@ ArrayList<PVector> getIntersections(List<PVector> lines) {
       // draw the intersection
       fill(255, 128, 0);
       ellipse(x, y, 10, 10);
+      intersections.add(new PVector(x, y));
     }
   }
   return intersections;
 }
 
+PVector intersection(PVector v1, PVector v2) {
+  float d = cos(v2.y) * sin(v1.y) - cos(v1.y) * sin(v2.y);
+      
+  float x = (v2.x * sin(v1.y) - v1.x * sin(v2.y)) / d;
+  float y = (-v2.x * cos(v1.y) + v1.x * cos(v2.y)) / d;
+  return new PVector(x, y);
+}
+
 void displayQuads(ArrayList<PVector> lines) {
+  
+  QuadGraph djYoloSwag2000 = new QuadGraph();
+  djYoloSwag2000.build(lines, width, height);
+  List<int[]> quads = djYoloSwag2000.findCycles(); 
+  
   for (int[] quad : quads) {
     PVector l1 = lines.get(quad[0]);
     PVector l2 = lines.get(quad[1]);
@@ -361,11 +377,16 @@ void displayQuads(ArrayList<PVector> lines) {
     PVector c23 = intersection(l2, l3);
     PVector c34 = intersection(l3, l4);
     PVector c41 = intersection(l4, l1);
-    // Choose a random, semi-transparent colour
-    Random random = new Random();
-    fill(color(min(255, random.nextInt(300)),
-    min(255, random.nextInt(300)),
-    min(255, random.nextInt(300)), 50));
-    quad(c12.x,c12.y,c23.x,c23.y,c34.x,c34.y,c41.x,c41.y);
+    
+    if (djYoloSwag2000.isConvex(c12, c23, c34, c41) && djYoloSwag2000.validArea(c12, c23, c34, c41, 1920 * 1920, 20 * 20) && djYoloSwag2000.nonFlatQuad(c12, c23, c34, c41)) {
+      // Choose a random, semi-transparent colour
+      Random random = new Random();
+      fill(color(min(255, random.nextInt(300)),
+      min(255, random.nextInt(300)),
+      min(255, random.nextInt(300)), 50));
+      quad(c12.x,c12.y,c23.x,c23.y,c34.x,c34.y,c41.x,c41.y);
+    }
+    
+    
   }
 }
