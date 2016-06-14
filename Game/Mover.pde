@@ -6,7 +6,7 @@ class Mover {
   
   float gravityConstant = 0.8;
   float reboundCoeff = 0.8f;
-  float radiusSphere = 5;//1f/20f * boxSize
+  float radiusSphere = 1f/20f * boxSize;
   float normalForce = 1;
   float mu = 0.01;
   float frictionMagnitude = normalForce * mu;
@@ -86,9 +86,8 @@ class Mover {
   
   void checkCylinderCollision() {
     PVector normal;
-    ArrayList<PVector> fff = new ArrayList<PVector>();
     for (PVector vect : cylinders) {
-      if (closerThan(vect, new PVector(location.x, location.z), radiusSphere + cylinder.cylinderBaseSize + 10)) {
+      if (closerThan(vect, new PVector(location.x, location.z), radiusSphere + cylinder.cylinderBaseSize)) {
         normal = new PVector(location.x - vect.x, 0, location.z - vect.y);
         normal.normalize();
         velocity.sub(normal.mult(velocity.dot(normal) * 2));
@@ -98,10 +97,6 @@ class Mover {
         location.x = vect.x - normal.x * (cylinder.cylinderBaseSize + radiusSphere + 0.001 * cylinder.cylinderBaseSize);
         location.z = vect.y - normal.z * (cylinder.cylinderBaseSize + radiusSphere + 0.001 * cylinder.cylinderBaseSize);
       }
-      else {
-        fff.add(vect);
-      }
-    }
-    cylinders = fff;    
+    }    
   }
 }

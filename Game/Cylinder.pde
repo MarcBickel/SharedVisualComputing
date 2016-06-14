@@ -1,5 +1,5 @@
 class Cylinder {  
-  float cylinderBaseSize = 20;//1f/25f * boxSize;
+  float cylinderBaseSize = 1f/25f * boxSize;
   float cylinderHeight = 7f/80f * boxSize;
   int cylinderResolution = 40;
   

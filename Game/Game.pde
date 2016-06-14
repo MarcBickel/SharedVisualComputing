@@ -23,7 +23,7 @@ int maxWidthBarChart = 50; //Size of the bars in the chart
 int scale = 1; //Scale of the barchart, for vertical resizing
 
 float boxThickness = 24f;
-float boxSize = 600f;
+float boxSize = 800f;
 
 HScrollbar scrollbar;
 
