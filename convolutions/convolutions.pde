@@ -1,6 +1,12 @@
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import processing.video.*;
+//Capture cam;
+
+/*Capture to Movie in declaring the video class*/
+//Capture cam;
+Movie cam;
 
 PImage img;
 int[] accumulator;
@@ -14,18 +20,52 @@ void settings() {
 }
 
 void setup() {
-    img = loadImage("board1.jpg");
-    noLoop();
+  //String[] cameras = Capture.list();
+  //if (cameras.length == 0) {
+  //  println("There are no cameras available for capture.");
+  //  exit();
+  //} else {
+  //  println("Available cameras:");
+  //  for (int i = 0; i < cameras.length; i++) {
+  //    println(cameras[i]);
+  //  }
+
+  //  cam = new Capture(this, cameras[0]);
+  //  cam.start();
+  //}
+  
+  
+  
+  //cam = new Capture(this, cameras[63]);
+  //cam.start();
+  cam = new Movie(this, "testvideo.mp4"); //Put the video in the same directory
+  cam.loop();
+
+
+
+    //img = loadImage("board4.jpg");
+    //noLoop();
 }
 
 void draw() {
+  if (cam.available() == true) {
+    cam.read();
+    img = cam.get();
     PImage image = sobel(antiGaussianBlur(intensityThresholding(gaussianBlur(colorThresholding(img)))));
     image(img, 0, 0);
     ArrayList<PVector> houghImage = hough(image, 4);
     getIntersections(houghImage);
     image(image, 800 + 400, 0);
     displayAccumulator(accumulator);
-    //displayQuads(houghImage);
+    ArrayList<ArrayList<PVector>> tempo = displayQuads(houghImage);
+    TwoDThreeD two = new TwoDThreeD(width, height);
+    if (tempo.size() != 0) {
+      two.get3DRotations(tempo.get(0));
+    }
+  }
+  
+    
+    
 }
 
 float computeWeight(float[][] tab) {
@@ -364,11 +404,12 @@ PVector intersection(PVector v1, PVector v2) {
     return new PVector(x, y);
 }
 
-void displayQuads(ArrayList<PVector> lines) {
+ArrayList<ArrayList<PVector>> displayQuads(ArrayList<PVector> lines) {
 
     QuadGraph quadGraph = new QuadGraph();
     quadGraph.build(lines, width, height);
     List<int[]> quads = quadGraph.findCycles();
+    ArrayList<ArrayList<PVector>> retur = new ArrayList<ArrayList<PVector>>();
 
     for (int[] quad : quads) {
         PVector l1 = lines.get(quad[0]);
@@ -382,6 +423,13 @@ void displayQuads(ArrayList<PVector> lines) {
         PVector c23 = intersection(l2, l3);
         PVector c34 = intersection(l3, l4);
         PVector c41 = intersection(l4, l1);
+        
+        ArrayList<PVector> temp = new ArrayList<PVector>();
+        temp.add(c12);
+        temp.add(c23);
+        temp.add(c34);
+        temp.add(c41);
+        
 
         if (quadGraph.isConvex(c12, c23, c34, c41) && quadGraph.validArea(c12, c23, c34, c41, 1920 * 1920, 20 * 20) && quadGraph.nonFlatQuad(c12, c23, c34, c41)) {
             // Choose a random, semi-transparent colour
@@ -390,8 +438,11 @@ void displayQuads(ArrayList<PVector> lines) {
                        min(255, random.nextInt(300)),
                        min(255, random.nextInt(300)), 50));
             quad(c12.x,c12.y,c23.x,c23.y,c34.x,c34.y,c41.x,c41.y);
+            retur.add((ArrayList) sortCorners(temp));
         }
 
 
     }
+    
+    return retur;
 }

@@ -1,4 +1,4 @@
-class CWComparator implements Comparator<PVector> {
+static class CWComparator implements Comparator<PVector> {
   PVector center;
   public CWComparator(PVector center) {
     this.center = center;
