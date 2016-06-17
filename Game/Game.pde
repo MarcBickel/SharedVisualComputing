@@ -38,6 +38,10 @@ Cylinder cylinder;
 ArrayList<PVector> cylinders = new ArrayList();
 ArrayList<Float> scores = new ArrayList();
 
+/*Capture to Movie in declaring the video class*/
+//Capture cam;
+Movie cam;
+
 void settings() {
   fullScreen(P3D);
 }
@@ -54,6 +58,27 @@ void setup() {
   barChart = createGraphics(4 * width / 5 - height / 5 - 20, height / 5 - 20 - 30, P2D);
   scrollbar = new HScrollbar(height / 5 + width / 5, height - 30 - 5, 600, 30);
   timer = 0;
+  
+  //For last milestone
+  cam = new Movie(this, "testvideo.mp4"); //Put the video in the same directory
+  cam.loop();
+  
+  //String[] cameras = Capture.list();
+  //if (cameras.length == 0) {
+  // println("There are no cameras available for capture.");
+  // exit();
+  //} else {
+  // println("Available cameras:");
+  // for (int i = 0; i < cameras.length; i++) {
+  //   println(cameras[i]);
+  // }
+
+  // cam = new Capture(this, cameras[0]);
+  // cam.start();
+  //}
+  
+  //cam = new Capture(this, cameras[0]);
+  //cam.start();
 }
 
 void draw() {
@@ -61,6 +86,24 @@ void draw() {
   camera();
   directionalLight(255, 240, 224, -1, 12, -9);
   ambientLight(46, 106, 255);
+  
+  if (cam.available() == true) {
+    cam.read();
+    img = cam.get();
+    PImage image = sobel(antiGaussianBlur(intensityThresholding(gaussianBlur(colorThresholding(img)))));
+    image(img, 0, 0);
+    ArrayList<PVector> houghImage = hough(image, 4);
+    getIntersections(houghImage);
+    ArrayList<ArrayList<PVector>> tempo = displayQuads(houghImage);
+    TwoDThreeD two = new TwoDThreeD(width, height);
+    PVector rotations = new PVector();
+    if (tempo.size() != 0) {
+      rotations = two.get3DRotations(tempo.get(0));
+    
+      angleX = map(rotations.x, -PI / 3, PI / 3, -1, 1);
+      angleZ = map(rotations.z, -PI / 3, PI / 3, -1, 1);
+    }
+  }
   
   switch (mode) {
     case GAMER:

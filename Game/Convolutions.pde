@@ -1,6 +1,9 @@
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import processing.video.*;
+
+
 
 PImage img;
 int[] accumulator;
@@ -14,18 +17,52 @@ void Csettings() {
 }
 
 void Csetup() {
-    img = loadImage("board1.jpg");
-    noLoop();
+  //String[] cameras = Capture.list();
+  //if (cameras.length == 0) {
+  //  println("There are no cameras available for capture.");
+  //  exit();
+  //} else {
+  //  println("Available cameras:");
+  //  for (int i = 0; i < cameras.length; i++) {
+  //    println(cameras[i]);
+  //  }
+
+  //  cam = new Capture(this, cameras[0]);
+  //  cam.start();
+  //}
+  
+  
+  
+  //cam = new Capture(this, cameras[63]);
+  //cam.start();
+  //cam = new Movie(this, "testvideo.mp4"); //Put the video in the same directory
+  //cam.loop();
+
+
+
+    //img = loadImage("board4.jpg");
+    //noLoop();
 }
 
 void Cdraw() {
+  if (cam.available() == true) {
+    cam.read();
+    img = cam.get();
     PImage image = sobel(antiGaussianBlur(intensityThresholding(gaussianBlur(colorThresholding(img)))));
     image(img, 0, 0);
     ArrayList<PVector> houghImage = hough(image, 4);
     getIntersections(houghImage);
     image(image, 800 + 400, 0);
     displayAccumulator(accumulator);
-    //displayQuads(houghImage);
+    ArrayList<ArrayList<PVector>> tempo = displayQuads(houghImage);
+    TwoDThreeD two = new TwoDThreeD(width, height);
+    if (tempo.size() != 0) {
+      two.get3DRotations(tempo.get(0));
+    }
+  }
+  
+    
+    
 }
 
 float computeWeight(float[][] tab) {
@@ -296,7 +333,7 @@ ArrayList<PVector> hough(PImage edgeImg, int nLines) {
         int x3 = (int) (-(y3 - r / sin(phi)) * (sin(phi) / cos(phi)));
 
         // Finally, plot the lines
-        stroke(204,102,0);
+        //stroke(204,102,0);
 
         if (y0 > 0) {
             if (x1 > 0) {
@@ -348,8 +385,8 @@ ArrayList<PVector> getIntersections(List<PVector> lines) {
             float y = (-line2.x * cos(line1.y) + line1.x * cos(line2.y)) / d;
 
             // draw the intersection
-            fill(255, 128, 0);
-            ellipse(x, y, 10, 10);
+            //fill(255, 128, 0);
+            //ellipse(x, y, 10, 10);
             intersections.add(new PVector(x, y));
         }
     }
@@ -364,11 +401,12 @@ PVector intersection(PVector v1, PVector v2) {
     return new PVector(x, y);
 }
 
-void displayQuads(ArrayList<PVector> lines) {
+ArrayList<ArrayList<PVector>> displayQuads(ArrayList<PVector> lines) {
 
     QuadGraph quadGraph = new QuadGraph();
     quadGraph.build(lines, width, height);
     List<int[]> quads = quadGraph.findCycles();
+    ArrayList<ArrayList<PVector>> retur = new ArrayList<ArrayList<PVector>>();
 
     for (int[] quad : quads) {
         PVector l1 = lines.get(quad[0]);
@@ -382,16 +420,26 @@ void displayQuads(ArrayList<PVector> lines) {
         PVector c23 = intersection(l2, l3);
         PVector c34 = intersection(l3, l4);
         PVector c41 = intersection(l4, l1);
+        
+        ArrayList<PVector> temp = new ArrayList<PVector>();
+        temp.add(c12);
+        temp.add(c23);
+        temp.add(c34);
+        temp.add(c41);
+        
 
         if (quadGraph.isConvex(c12, c23, c34, c41) && quadGraph.validArea(c12, c23, c34, c41, 1920 * 1920, 20 * 20) && quadGraph.nonFlatQuad(c12, c23, c34, c41)) {
             // Choose a random, semi-transparent colour
-            Random random = new Random();
-            fill(color(min(255, random.nextInt(300)),
-                       min(255, random.nextInt(300)),
-                       min(255, random.nextInt(300)), 50));
-            quad(c12.x,c12.y,c23.x,c23.y,c34.x,c34.y,c41.x,c41.y);
+            //Random random = new Random();
+            //fill(color(min(255, random.nextInt(300)),
+            //           min(255, random.nextInt(300)),
+            //           min(255, random.nextInt(300)), 50));
+            //quad(c12.x,c12.y,c23.x,c23.y,c34.x,c34.y,c41.x,c41.y);
+            retur.add((ArrayList) sortCorners(temp));
         }
 
 
     }
+    
+    return retur;
 }
