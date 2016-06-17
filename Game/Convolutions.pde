@@ -12,59 +12,6 @@ int[] accumulator;
 int phiDim;
 int rDim;
 
-void Csettings() {
-    size(800 + 600 + 800, 600);
-}
-
-void Csetup() {
-  //String[] cameras = Capture.list();
-  //if (cameras.length == 0) {
-  //  println("There are no cameras available for capture.");
-  //  exit();
-  //} else {
-  //  println("Available cameras:");
-  //  for (int i = 0; i < cameras.length; i++) {
-  //    println(cameras[i]);
-  //  }
-
-  //  cam = new Capture(this, cameras[0]);
-  //  cam.start();
-  //}
-  
-  
-  
-  //cam = new Capture(this, cameras[63]);
-  //cam.start();
-  //cam = new Movie(this, "testvideo.mp4"); //Put the video in the same directory
-  //cam.loop();
-
-
-
-    //img = loadImage("board4.jpg");
-    //noLoop();
-}
-
-void Cdraw() {
-  if (cam.available() == true) {
-    cam.read();
-    img = cam.get();
-    PImage image = sobel(antiGaussianBlur(intensityThresholding(gaussianBlur(colorThresholding(img)))));
-    image(img, 0, 0);
-    ArrayList<PVector> houghImage = hough(image, 4);
-    getIntersections(houghImage);
-    image(image, 800 + 400, 0);
-    displayAccumulator(accumulator);
-    ArrayList<ArrayList<PVector>> tempo = displayQuads(houghImage);
-    TwoDThreeD two = new TwoDThreeD(width, height);
-    if (tempo.size() != 0) {
-      two.get3DRotations(tempo.get(0));
-    }
-  }
-  
-    
-    
-}
-
 float computeWeight(float[][] tab) {
     float result = 0;
     for (int i = 0; i < tab.length; ++i) {
@@ -384,9 +331,6 @@ ArrayList<PVector> getIntersections(List<PVector> lines) {
             float x = (line2.x * sin(line1.y) - line1.x * sin(line2.y)) / d;
             float y = (-line2.x * cos(line1.y) + line1.x * cos(line2.y)) / d;
 
-            // draw the intersection
-            //fill(255, 128, 0);
-            //ellipse(x, y, 10, 10);
             intersections.add(new PVector(x, y));
         }
     }
@@ -429,12 +373,6 @@ ArrayList<ArrayList<PVector>> displayQuads(ArrayList<PVector> lines) {
         
 
         if (quadGraph.isConvex(c12, c23, c34, c41) && quadGraph.validArea(c12, c23, c34, c41, 1920 * 1920, 20 * 20) && quadGraph.nonFlatQuad(c12, c23, c34, c41)) {
-            // Choose a random, semi-transparent colour
-            //Random random = new Random();
-            //fill(color(min(255, random.nextInt(300)),
-            //           min(255, random.nextInt(300)),
-            //           min(255, random.nextInt(300)), 50));
-            //quad(c12.x,c12.y,c23.x,c23.y,c34.x,c34.y,c41.x,c41.y);
             retur.add((ArrayList) sortCorners(temp));
         }
 

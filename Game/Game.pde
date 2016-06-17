@@ -39,7 +39,6 @@ ArrayList<PVector> cylinders = new ArrayList();
 ArrayList<Float> scores = new ArrayList();
 
 /*Capture to Movie in declaring the video class*/
-//Capture cam;
 Movie cam;
 
 void settings() {
@@ -62,23 +61,6 @@ void setup() {
   //For last milestone
   cam = new Movie(this, "testvideo.mp4"); //Put the video in the same directory
   cam.loop();
-  
-  //String[] cameras = Capture.list();
-  //if (cameras.length == 0) {
-  // println("There are no cameras available for capture.");
-  // exit();
-  //} else {
-  // println("Available cameras:");
-  // for (int i = 0; i < cameras.length; i++) {
-  //   println(cameras[i]);
-  // }
-
-  // cam = new Capture(this, cameras[0]);
-  // cam.start();
-  //}
-  
-  //cam = new Capture(this, cameras[0]);
-  //cam.start();
 }
 
 void draw() {
@@ -91,6 +73,7 @@ void draw() {
     cam.read();
     img = cam.get();
     PImage image = sobel(antiGaussianBlur(intensityThresholding(gaussianBlur(colorThresholding(img)))));
+    img.resize(320, 240);
     image(img, 0, 0);
     ArrayList<PVector> houghImage = hough(image, 4);
     getIntersections(houghImage);
